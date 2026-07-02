@@ -169,46 +169,108 @@
 
 <!-- DASHBOARD PAGE -->
 <section class="page-section" id="page-dashboard">
-  <div class="greeting-banner">
-    <div class="greeting-text">
-      <h2 id="greetingText">Good Morning, Faculty 👋</h2>
-      <p id="greetingSub">Here's your academic overview for today</p>
-    </div>
-    <button class="btn btn-primary" onclick="Nav.go('attendance')" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3);backdrop-filter:blur(4px)">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>
-      Take Attendance
-    </button>
+
+  <!-- TIIMO-STYLE: Day selector strip -->
+  <div class="tiimo-day-strip">
+    <div class="tiimo-day-item" id="dayMon"><span class="day-letter">M</span></div>
+    <div class="tiimo-day-item" id="dayTue"><span class="day-letter">T</span></div>
+    <div class="tiimo-day-item" id="dayWed"><span class="day-letter">W</span></div>
+    <div class="tiimo-day-item" id="dayThu"><span class="day-letter">T</span></div>
+    <div class="tiimo-day-item" id="dayFri"><span class="day-letter">F</span></div>
+    <div class="tiimo-day-item" id="daySat"><span class="day-letter">S</span></div>
+    <div class="tiimo-day-item" id="daySun"><span class="day-letter">S</span></div>
   </div>
-  <div id="alertBanners"></div>
-  <div class="stats-grid">
-    <div class="stat-card"><div class="stat-icon blue"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div><div class="stat-number" id="statTotal">–</div><div class="stat-label">Today's Classes</div></div></div>
-    <div class="stat-card"><div class="stat-icon green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg></div><div><div class="stat-number" id="statDone">–</div><div class="stat-label">Attendance Taken</div></div></div>
-    <div class="stat-card"><div class="stat-icon orange"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div><div class="stat-number" id="statPending">–</div><div class="stat-label">Pending</div></div></div>
-    <div class="stat-card"><div class="stat-icon red"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="23" y1="3" x2="17" y2="9"/></svg></div><div><div class="stat-number" id="statAbsent">–</div><div class="stat-label">Absentees Today</div></div></div>
-    <div class="stat-card"><div class="stat-icon purple"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div><div class="stat-number" id="statDays">–</div><div class="stat-label">Days Recorded</div></div></div>
-  </div>
-  <div class="dash-grid">
-    <div class="card">
-      <div class="card-header"><h3>📅 Today's Schedule</h3><button class="btn btn-secondary btn-sm" onclick="Nav.go('timetable')">View All</button></div>
-      <div class="card-body" style="padding:12px 16px"><div id="todaySchedule"><div class="loading-state"><div class="spinner spinner-dark"></div><span>Loading schedule…</span></div></div></div>
+
+  <!-- Greeting + ring hero -->
+  <div class="tiimo-hero-row">
+    <!-- Circular progress ring -->
+    <div class="tiimo-ring-wrap">
+      <svg class="tiimo-ring-svg" viewBox="0 0 200 200">
+        <circle class="tiimo-ring-bg" cx="100" cy="100" r="80" />
+        <circle class="tiimo-ring-done" cx="100" cy="100" r="80" id="ringDoneArc" />
+        <circle class="tiimo-ring-pending" cx="100" cy="100" r="80" id="ringPendingArc" />
+      </svg>
+      <div class="tiimo-ring-center">
+        <div class="tiimo-ring-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <div class="tiimo-ring-pct" id="ringPct">–%</div>
+        <div class="tiimo-ring-sub">done</div>
+      </div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:16px">
+    <!-- Greeting + stats -->
+    <div class="tiimo-hero-text">
+      <div class="tiimo-greeting" id="greetingText">Good Morning 👋</div>
+      <div class="tiimo-greeting-sub" id="greetingSub">Here's your academic overview</div>
+      <div class="tiimo-mini-stats">
+        <div class="tiimo-mini-stat tiimo-stat-blue">
+          <div class="tiimo-mini-num" id="statTotal">–</div>
+          <div class="tiimo-mini-lbl">Classes</div>
+        </div>
+        <div class="tiimo-mini-stat tiimo-stat-green">
+          <div class="tiimo-mini-num" id="statDone">–</div>
+          <div class="tiimo-mini-lbl">Done</div>
+        </div>
+        <div class="tiimo-mini-stat tiimo-stat-orange">
+          <div class="tiimo-mini-num" id="statPending">–</div>
+          <div class="tiimo-mini-lbl">Pending</div>
+        </div>
+        <div class="tiimo-mini-stat tiimo-stat-red">
+          <div class="tiimo-mini-num" id="statAbsent">–</div>
+          <div class="tiimo-mini-lbl">Absent</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="Nav.go('attendance')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/></svg>
+          Take Attendance
+        </button>
+        <button class="btn btn-secondary" onclick="Nav.go('reports')">View Reports</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="alertBanners" style="margin-bottom:12px"></div>
+
+  <!-- Stats row (days recorded + quick actions) -->
+  <div class="tiimo-bottom-row">
+    <!-- Timeline schedule -->
+    <div class="card tiimo-schedule-card">
+      <div class="card-header">
+        <h3>Today's Schedule</h3>
+        <button class="btn btn-secondary btn-sm" onclick="Nav.go('timetable')">View All</button>
+      </div>
+      <div class="card-body" style="padding:8px 16px 16px">
+        <div id="todaySchedule"><div class="loading-state"><div class="spinner spinner-dark"></div><span>Loading…</span></div></div>
+      </div>
+    </div>
+    <!-- Side panel -->
+    <div style="display:flex;flex-direction:column;gap:14px">
       <div class="card">
         <div class="card-header"><h3>⚡ Quick Actions</h3></div>
-        <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+        <div class="card-body" style="display:flex;flex-direction:column;gap:8px;padding:14px 18px">
           <button class="btn btn-primary btn-full" onclick="Nav.go('attendance')">Take Attendance</button>
           <button class="btn btn-secondary btn-full" onclick="Nav.go('reports')">View Reports</button>
           <button class="btn btn-secondary btn-full" onclick="Nav.go('coverage')">Syllabus Coverage</button>
           <button class="btn btn-secondary btn-full" onclick="Nav.go('students')">Manage Students</button>
-          <button class="btn btn-secondary btn-full" onclick="Nav.go('calendar')">Attendance Calendar</button>
+          <button class="btn btn-secondary btn-full" onclick="Nav.go('calendar')">Calendar</button>
         </div>
       </div>
       <div class="card">
         <div class="card-header"><h3>📆 Upcoming</h3></div>
-        <div class="card-body" id="upcomingSection" style="font-size:13px;color:var(--text-muted)">Loading…</div>
+        <div class="card-body" id="upcomingSection" style="font-size:13px;color:var(--text-muted);padding:14px 18px">Loading…</div>
+      </div>
+      <div class="tiimo-days-stat card">
+        <div class="card-body" style="padding:16px 20px;display:flex;align-items:center;gap:14px">
+          <div class="tiimo-stat-pill tiimo-stat-purple">
+            <div class="tiimo-mini-num" id="statDays">–</div>
+            <div class="tiimo-mini-lbl">Days Recorded</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
 </section>
 
 <!-- ATTENDANCE PAGE -->
@@ -287,7 +349,16 @@
 <section class="page-section hidden" id="page-students">
   <div class="page-header">
     <div><div class="page-title">Student Management</div><div class="page-subtitle">View, search, and manage students</div></div>
-    <div class="page-actions"><button class="btn btn-primary" onclick="Utils.modal.open('addStudentModal')">+ Add Student</button></div>
+    <div class="page-actions">
+      <button class="btn btn-secondary" id="addClassBtn" onclick="openAddClassModal()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Add Class
+      </button>
+      <button class="btn btn-primary" onclick="showAddStudentModal()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        Add Student
+      </button>
+    </div>
   </div>
   <div class="card" style="margin-bottom:16px">
     <div class="card-body" style="padding:14px 20px">
@@ -453,8 +524,28 @@
 </section>
 
     </main>
+    <!-- BOTTOM NAVIGATION BAR (Mobile view) -->
+    <nav class="bottom-nav">
+      <div class="nav-item bottom-nav-item active" data-page="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Home</span>
+      </div>
+      <div class="nav-item bottom-nav-item" data-page="attendance">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/></svg>
+        <span>Mark</span>
+      </div>
+      <div class="nav-item bottom-nav-item" data-page="extra-classes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <span>Extra</span>
+      </div>
+      <div class="nav-item bottom-nav-item" data-page="students">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Students</span>
+      </div>
+    </nav>
   </div>
 </div>
+
 
 <!-- MODALS -->
 <div class="modal-overlay" id="addStudentModal">
@@ -465,6 +556,101 @@
       <div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="newStudentName" class="form-control" placeholder="Student full name"/></div>
     </div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="Utils.modal.close('addStudentModal')">Cancel</button><button class="btn btn-primary" onclick="saveStudent()">Add Student</button></div>
+  </div>
+</div>
+
+<!-- ADD CLASS MODAL -->
+<div class="modal-overlay" id="addClassModal">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <div>
+        <h3>📋 Add New Class Roster</h3>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Generate a template → share with CR → import filled sheet</div>
+      </div>
+      <button class="modal-close" onclick="Utils.modal.close('addClassModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Step indicator -->
+      <div class="ac-steps" id="acSteps">
+        <div class="ac-step active" id="acStep1Dot"><span>1</span><span class="ac-step-lbl">Setup</span></div>
+        <div class="ac-step-line"></div>
+        <div class="ac-step" id="acStep2Dot"><span>2</span><span class="ac-step-lbl">Template</span></div>
+        <div class="ac-step-line"></div>
+        <div class="ac-step" id="acStep3Dot"><span>3</span><span class="ac-step-lbl">Import</span></div>
+      </div>
+
+      <!-- STEP 1: Class Setup -->
+      <div id="acStep1">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Year *</label>
+            <select id="acYear" class="form-control">
+              <option value="">Select Year</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Section *</label>
+            <select id="acSection" class="form-control">
+              <option value="">Select Section</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Number of Students (approx.)</label>
+          <input type="number" id="acCount" class="form-control" value="30" min="1" max="120" placeholder="30"/>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Pre-fills roll numbers in the template for the CR to fill names against</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">CR Name (optional)</label>
+          <input type="text" id="acCrName" class="form-control" placeholder="e.g. Arjun Kumar"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">CR WhatsApp Number (optional)</label>
+          <input type="tel" id="acCrPhone" class="form-control" placeholder="e.g. 9876543210"/>
+        </div>
+      </div>
+
+      <!-- STEP 2: Template & Share -->
+      <div id="acStep2" class="hidden">
+        <div class="ac-template-preview" id="acTemplatePreview"></div>
+        <div class="ac-share-row">
+          <button class="btn btn-primary" id="acDownloadBtn" onclick="downloadClassTemplate()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download CSV Template
+          </button>
+          <button class="btn btn-secondary" id="acSheetsBtn" onclick="openGoogleSheetsTemplate()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+            Open in Google Sheets
+          </button>
+          <button class="btn btn-secondary" id="acShareWABtn" onclick="shareTemplateWA()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Share via WhatsApp
+          </button>
+        </div>
+        <div class="ac-info-box">
+          <div style="font-weight:700;font-size:13px;margin-bottom:8px">📌 Instructions for CR</div>
+          <ol style="font-size:13px;color:var(--text-secondary);line-height:2;padding-left:18px" id="acInstructions"></ol>
+        </div>
+      </div>
+
+      <!-- STEP 3: Import -->
+      <div id="acStep3" class="hidden">
+        <div class="ac-import-zone" id="acDropZone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--primary);margin-bottom:12px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div style="font-size:15px;font-weight:700;color:var(--text-primary)">Drop CSV file here</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:4px">or click to browse</div>
+          <input type="file" id="acFileInput" accept=".csv,.xlsx" style="display:none" onchange="handleClassCSVUpload(event)"/>
+        </div>
+        <div style="text-align:center;margin:12px 0;font-size:13px;color:var(--text-muted)">— or paste CSV data directly —</div>
+        <textarea id="acPasteArea" class="form-control" rows="6" placeholder="Paste CSV content here (Roll No, Name, Student ID)…"></textarea>
+        <div id="acImportPreview" style="margin-top:16px"></div>
+      </div>
+    </div>
+    <div class="modal-footer" id="acFooter">
+      <button class="btn btn-ghost" id="acBackBtn" onclick="acPrevStep()" style="display:none">← Back</button>
+      <button class="btn btn-secondary" onclick="Utils.modal.close('addClassModal')">Cancel</button>
+      <button class="btn btn-primary" id="acNextBtn" onclick="acNextStep()">Next →</button>
+    </div>
   </div>
 </div>
 

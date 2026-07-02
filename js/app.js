@@ -79,10 +79,20 @@ function initNavbar() {
   if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
   // themeBtn has inline onclick="toggleTheme()" — no extra listener needed
   updateThemeIcon(AttendX.theme.get());
-  // Greeting
+  // Greeting – supports both old <h2> and new Tiimo flat div
   const greet = document.getElementById('greetingText');
-  if (greet) { const h = new Date().getHours(); const g = h<12?'Good Morning':h<17?'Good Afternoon':'Good Evening'; greet.textContent = `${g}, ${session.name.split(' ')[0]} 👋`; }
+  const greetSub = document.getElementById('greetingSub');
+  if (greet) {
+    const h = new Date().getHours();
+    const g = h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening';
+    greet.textContent = `${g}, ${session.name.split(' ')[0]} 👋`;
+  }
+  if (greetSub) {
+    const d = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: '2-digit', month: 'long' });
+    greetSub.textContent = `${d} – Here's your academic overview`;
+  }
 }
+
 
 function updateThemeIcon(theme) {
   // Support both ID variants in different HTML templates
@@ -132,10 +142,54 @@ async function showDashboard() {
 
   renderTodaySchedule(schedule, todayExtra);
 
+  // ── TIIMO: animate circular ring ──────────────────────────────────────
+  initTiimoDayStrip();
+  animateTiimoRing(taken, totalToday - taken);
+  // ── end Tiimo ──────────────────────────────────────────────────────────
+
   AttendX.realtime.onRefresh('page', async (ev) => {
     if (['attendance', 'timetable', 'extra_classes'].includes(ev.type)) await showDashboard();
   });
 }
+
+/* ── Tiimo Day Strip – highlight today ───────────────────────────────── */
+function initTiimoDayStrip() {
+  const dayIds = ['dayMon','dayTue','dayWed','dayThu','dayFri','daySat','daySun'];
+  const todayIdx = (new Date().getDay() + 6) % 7; // Mon=0 … Sun=6
+  dayIds.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle('active', i === todayIdx);
+  });
+}
+
+/* ── Tiimo Ring – animate SVG stroke-dashoffset ──────────────────────── */
+function animateTiimoRing(done, pending) {
+  const total = done + pending;
+  const CIRC  = 502.65; // 2π×80
+  const donePct    = total ? done    / total : 0;
+  const pendingPct = total ? pending / total : 0;
+
+  const pctEl = document.getElementById('ringPct');
+  if (pctEl) pctEl.textContent = total ? Math.round(donePct * 100) + '%' : '–%';
+
+  // green arc = done classes
+  const doneArc = document.getElementById('ringDoneArc');
+  if (doneArc) {
+    doneArc.style.strokeDashoffset = CIRC * (1 - donePct);
+  }
+
+  // purple arc = pending (starts where green ends)
+  const pendArc = document.getElementById('ringPendingArc');
+  if (pendArc) {
+    // We rotate the pending arc by the done angle so it begins after green
+    const doneAngle = donePct * 360;
+    pendArc.style.transform = `rotate(${doneAngle}deg)`;
+    pendArc.style.transformOrigin = '100px 100px'; // SVG center
+    pendArc.style.strokeDashoffset = CIRC * (1 - pendingPct);
+  }
+}
+
 
 function renderTodaySchedule(schedule, extras = []) {
   const container = document.getElementById('todayScheduleList') || document.getElementById('todaySchedule');
@@ -721,7 +775,379 @@ async function removeStudentConfirm(year, section, rollNo, name) {
   AttendX.toast.show(`${name} removed`, 'info');
 }
 
-// ==================== TIMETABLE ====================
+// ==================== ADD CLASS ROSTER ====================
+let _acStep = 1;
+let _acTemplateRows = [];   // generated template rows [{rollNo, name, studentId}]
+let _acParsedStudents = []; // imported/parsed students ready to save
+
+function openAddClassModal() {
+  // Reset state
+  _acStep = 1;
+  _acTemplateRows = [];
+  _acParsedStudents = [];
+
+  // Populate selects
+  const yrSel  = document.getElementById('acYear');
+  const secSel = document.getElementById('acSection');
+  yrSel.innerHTML  = '<option value="">Select Year</option>'  + AttendX.utils.YEARS.map(y => `<option value="${y}">${y}</option>`).join('');
+  secSel.innerHTML = '<option value="">Select Section</option>' + AttendX.utils.SECTIONS.map(s => `<option value="${s}">Section ${s}</option>`).join('');
+
+  // Reset form inputs
+  document.getElementById('acCount').value = '30';
+  document.getElementById('acCrName').value = '';
+  document.getElementById('acCrPhone').value = '';
+  document.getElementById('acPasteArea').value = '';
+  document.getElementById('acImportPreview').innerHTML = '';
+
+  // Show step 1, hide others
+  _acUpdateStepUI();
+
+  Utils.modal.open('addClassModal');
+}
+
+function _acUpdateStepUI() {
+  // Show/hide step panels
+  [1, 2, 3].forEach(n => {
+    const el = document.getElementById(`acStep${n}`);
+    if (el) el.classList.toggle('hidden', n !== _acStep);
+  });
+
+  // Update step dots
+  [1, 2, 3].forEach(n => {
+    const dot = document.getElementById(`acStep${n}Dot`);
+    if (!dot) return;
+    dot.classList.remove('active', 'done');
+    if (n < _acStep)       dot.classList.add('done');
+    else if (n === _acStep) dot.classList.add('active');
+  });
+
+  // Update step-line colors
+  document.querySelectorAll('.ac-step-line').forEach((line, i) => {
+    line.classList.toggle('done', i + 1 < _acStep);
+  });
+
+  // Update footer buttons
+  const backBtn = document.getElementById('acBackBtn');
+  const nextBtn = document.getElementById('acNextBtn');
+  if (backBtn) backBtn.style.display = _acStep > 1 ? '' : 'none';
+  if (nextBtn) {
+    if (_acStep === 1) { nextBtn.textContent = 'Generate Template →'; }
+    else if (_acStep === 2) { nextBtn.textContent = 'Import Students →'; }
+    else { nextBtn.textContent = '✓ Save All Students'; }
+  }
+}
+
+async function acNextStep() {
+  if (_acStep === 1) {
+    // Validate
+    const year    = document.getElementById('acYear').value;
+    const section = document.getElementById('acSection').value;
+    const count   = parseInt(document.getElementById('acCount').value) || 30;
+    if (!year || !section) { AttendX.toast.show('Select year and section', 'warning'); return; }
+
+    // Generate template rows
+    const yearNum = AttendX.utils.YEARS.indexOf(year) + 1;
+    _acTemplateRows = Array.from({ length: count }, (_, i) => ({
+      rollNo:    `${yearNum}${section}${String(i + 1).padStart(3, '0')}`,
+      name:      '',
+      studentId: '',
+    }));
+
+    _acRenderTemplatePreview(year, section, count);
+    _acStep = 2;
+    _acUpdateStepUI();
+
+  } else if (_acStep === 2) {
+    _acStep = 3;
+    _acInitImportZone();
+    _acUpdateStepUI();
+
+  } else if (_acStep === 3) {
+    // Save all parsed students
+    if (!_acParsedStudents.length) {
+      AttendX.toast.show('No students to import. Upload or paste data first.', 'warning');
+      return;
+    }
+    await _acSaveStudents();
+  }
+}
+
+function acPrevStep() {
+  if (_acStep > 1) { _acStep--; _acUpdateStepUI(); }
+}
+
+function _acRenderTemplatePreview(year, section, count) {
+  const preview = document.getElementById('acTemplatePreview');
+  const crName  = document.getElementById('acCrName').value.trim() || 'Class CR';
+  const rows    = _acTemplateRows.slice(0, Math.min(5, count)); // show first 5 in preview
+
+  const badge = `<span class="ac-preview-badge">fill in →</span>`;
+  let html = `<div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">
+    <strong>${count} rows</strong> pre-filled for ${year} – Section ${section} &nbsp;·&nbsp; Showing first 5
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Roll No</th><th>Student Name</th><th>Student ID (optional)</th></tr></thead>
+    <tbody>
+      ${rows.map((r, i) => `<tr>
+        <td>${i + 1}</td>
+        <td>${r.rollNo}</td>
+        <td>${badge}</td>
+        <td>${badge}</td>
+      </tr>`).join('')}
+      ${count > 5 ? `<tr><td colspan="4" style="text-align:center;padding:8px;color:var(--text-muted);font-style:italic">… ${count - 5} more rows in the downloaded file</td></tr>` : ''}
+    </tbody>
+  </table>`;
+
+  preview.innerHTML = html;
+
+  // Build instructions
+  const instrEl = document.getElementById('acInstructions');
+  if (instrEl) instrEl.innerHTML = `
+    <li>Download the CSV template using the button below</li>
+    <li>Open in <strong>Google Sheets</strong> (File → Import) or Excel</li>
+    <li>Fill in <strong>Student Name</strong> and <strong>Student ID</strong> columns for each row</li>
+    <li>Save the sheet and share back (WhatsApp / Email) to mam</li>
+    <li>Mam will import the filled sheet in <strong>Step 3</strong> to bulk-add students</li>
+  `;
+}
+
+function downloadClassTemplate() {
+  const year    = document.getElementById('acYear').value;
+  const section = document.getElementById('acSection').value;
+  const session = AttendX.auth.getSession();
+  const teacher = session?.name || 'Teacher';
+  const now     = new Date().toLocaleDateString('en-IN');
+
+  const header = `# AttendX Student Roster Template\n# Class: ${year} – Section ${section} | Teacher: ${teacher} | Date: ${now}\n# Instructions: Fill in "Student Name" and "Student ID" columns. Do not change Roll No column.\n`;
+  const csvHeader = 'S.No,Roll No,Student Name,Student ID (optional)\n';
+  const rows = _acTemplateRows.map((r, i) => `${i + 1},${r.rollNo},,`).join('\n');
+  const csv  = header + csvHeader + rows;
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), {
+    href: url,
+    download: `AttendX_${year.replace(/\s/g,'')}_Sec${section}_Roster.csv`,
+  });
+  a.click();
+  URL.revokeObjectURL(url);
+  AttendX.toast.show('Template downloaded! Share with your CR.', 'success');
+}
+
+function openGoogleSheetsTemplate() {
+  const year    = document.getElementById('acYear').value;
+  const section = document.getElementById('acSection').value;
+  // Build CSV data for Google Sheets import
+  const csvHeader = 'S.No,Roll No,Student Name,Student ID\n';
+  const rows = _acTemplateRows.map((r, i) => `${i + 1},${r.rollNo},,`).join('\n');
+  const csv  = csvHeader + rows;
+
+  // Encode as data URI for Sheets (will open Sheets with the import prompt)
+  const encodedCsv = encodeURIComponent(csv);
+  const sheetsUrl  = `https://docs.google.com/spreadsheets/create?title=AttendX+${encodeURIComponent(year)}+Sec+${section}+Roster`;
+  window.open(sheetsUrl, '_blank');
+
+  // Also download the file so user can import into the new sheet
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), { href: url, download: `roster_${year}_${section}.csv` });
+  a.click();
+  URL.revokeObjectURL(url);
+  AttendX.toast.show('Google Sheets opened + CSV downloaded. Import the CSV into the new sheet.', 'info', 6000);
+}
+
+function shareTemplateWA() {
+  const year    = document.getElementById('acYear').value;
+  const section = document.getElementById('acSection').value;
+  const crName  = document.getElementById('acCrName').value.trim() || 'CR';
+  const crPhone = document.getElementById('acCrPhone').value.trim().replace(/\D/g, '');
+  const session = AttendX.auth.getSession();
+
+  const msg = `📋 *AttendX – Class Roster Request*
+
+Hello ${crName}! 👋
+
+*Class:* ${year} – Section ${section}
+*Sent by:* ${session?.name || 'Faculty'}
+
+Please fill in the student details in the sheet below:
+
+✅ *Steps:*
+1. Open the CSV file I'll share
+2. Fill in: *Name* and *Student ID* for each roll number
+3. Send the filled sheet back to me
+4. I'll import it into AttendX
+
+_Thank you! 🙏_
+_– Sent via AttendX_`;
+
+  const url = crPhone
+    ? `https://wa.me/91${crPhone}?text=${encodeURIComponent(msg)}`
+    : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+
+  window.open(url, '_blank');
+  // Also download the template
+  downloadClassTemplate();
+}
+
+function _acInitImportZone() {
+  const zone      = document.getElementById('acDropZone');
+  const fileInput = document.getElementById('acFileInput');
+  if (!zone || !fileInput) return;
+
+  zone.onclick = () => fileInput.click();
+  zone.ondragover = (e) => { e.preventDefault(); zone.classList.add('drag-over'); };
+  zone.ondragleave = () => zone.classList.remove('drag-over');
+  zone.ondrop = (e) => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) _acProcessFile(file);
+  };
+
+  // Also watch paste area
+  document.getElementById('acPasteArea').oninput = () => {
+    const text = document.getElementById('acPasteArea').value.trim();
+    if (text) _acParseAndPreview(text);
+  };
+}
+
+function handleClassCSVUpload(event) {
+  const file = event.target.files[0];
+  if (file) _acProcessFile(file);
+}
+
+function _acProcessFile(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => _acParseAndPreview(e.target.result);
+  reader.readAsText(file, 'UTF-8');
+}
+
+function _acParseAndPreview(text) {
+  const year    = document.getElementById('acYear').value;
+  const section = document.getElementById('acSection').value;
+
+  // Strip comment lines (start with #)
+  const lines = text.split('\n').filter(l => l.trim() && !l.trim().startsWith('#'));
+  if (!lines.length) { AttendX.toast.show('No data found in file', 'warning'); return; }
+
+  // Detect header row
+  const firstLine = lines[0].toLowerCase();
+  const hasHeader = firstLine.includes('name') || firstLine.includes('roll') || firstLine.includes('s.no') || firstLine.includes('sno');
+  const dataLines = hasHeader ? lines.slice(1) : lines;
+
+  const parsed = [];
+  const errors = [];
+
+  dataLines.forEach((line, idx) => {
+    if (!line.trim()) return;
+    // Support comma and tab delimited
+    const parts = line.includes('\t') ? line.split('\t') : line.split(',');
+    const cols   = parts.map(p => p.replace(/^"|"$/g, '').trim());
+
+    // Try to figure out columns flexibly
+    // Expected: S.No, Roll No, Name, Student ID  (or just: Roll No, Name, Student ID)
+    let rollNo, name, studentId;
+    if (cols.length >= 4) {
+      // S.No, Roll No, Name, StudentID
+      rollNo = cols[1]; name = cols[2]; studentId = cols[3];
+    } else if (cols.length === 3) {
+      rollNo = cols[0]; name = cols[1]; studentId = cols[2];
+    } else if (cols.length === 2) {
+      rollNo = cols[0]; name = cols[1]; studentId = '';
+    } else {
+      errors.push({ line: idx + 1, reason: 'Too few columns' }); return;
+    }
+
+    if (!rollNo.trim()) { errors.push({ line: idx + 1, reason: 'Missing roll number' }); return; }
+    if (!name.trim())   { errors.push({ line: idx + 1, reason: 'Missing name' }); return; }
+
+    parsed.push({ rollNo: rollNo.trim(), name: name.trim(), studentId: studentId.trim() });
+  });
+
+  _acParsedStudents = parsed;
+  _acRenderImportPreview(parsed, errors, year, section);
+}
+
+function _acRenderImportPreview(parsed, errors, year, section) {
+  const container = document.getElementById('acImportPreview');
+  if (!container) return;
+
+  if (!parsed.length && !errors.length) {
+    container.innerHTML = `<div class="empty-state" style="padding:24px"><div class="empty-icon">📭</div><p>No valid data detected</p></div>`;
+    return;
+  }
+
+  const validCount = parsed.length;
+  const errCount   = errors.length;
+
+  let html = `<div class="ac-import-count">
+    <span style="color:var(--success)">✓ ${validCount} students ready to import</span>
+    ${errCount ? `<span style="color:var(--danger)">✗ ${errCount} errors</span>` : ''}
+    <span style="color:var(--text-muted);margin-left:auto">${year} – Section ${section}</span>
+  </div>
+  <div style="max-height:260px;overflow-y:auto;border-radius:10px;border:1px solid var(--border)">
+  <table class="ac-import-table">
+    <thead><tr><th>#</th><th>Roll No</th><th>Student Name</th><th>Student ID</th></tr></thead>
+    <tbody>
+    ${parsed.slice(0, 50).map((s, i) => `<tr class="valid-row">
+      <td>${i + 1}</td>
+      <td><code>${s.rollNo}</code></td>
+      <td>${s.name}</td>
+      <td style="color:var(--text-muted)">${s.studentId || '—'}</td>
+    </tr>`).join('')}
+    ${parsed.length > 50 ? `<tr><td colspan="4" style="text-align:center;padding:8px;color:var(--text-muted)">… ${parsed.length - 50} more</td></tr>` : ''}
+    </tbody>
+  </table>
+  </div>`;
+
+  if (errCount) {
+    html += `<div style="margin-top:10px;padding:10px 14px;background:var(--danger-light);border-radius:8px;font-size:12px;color:#991b1b">
+      <strong>⚠ Skipped rows:</strong> ${errors.map(e => `Row ${e.line} (${e.reason})`).join(' · ')}
+    </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+async function _acSaveStudents() {
+  const year    = document.getElementById('acYear').value;
+  const section = document.getElementById('acSection').value;
+  if (!year || !section) { AttendX.toast.show('Class info missing', 'error'); return; }
+  if (!_acParsedStudents.length) { AttendX.toast.show('No students to import', 'warning'); return; }
+
+  const nextBtn = document.getElementById('acNextBtn');
+  if (nextBtn) { nextBtn.textContent = 'Saving…'; nextBtn.disabled = true; }
+
+  let saved = 0, failed = 0;
+  for (const s of _acParsedStudents) {
+    try {
+      const result = await AttendX.students.addStudent(year, section, { rollNo: s.rollNo, name: s.name });
+      if (result) saved++; else failed++;
+    } catch (e) {
+      console.error('[AddClass] Failed to add', s.rollNo, e);
+      failed++;
+    }
+  }
+
+  if (nextBtn) { nextBtn.textContent = '✓ Save All Students'; nextBtn.disabled = false; }
+
+  if (saved > 0) {
+    AttendX.toast.show(`✓ ${saved} students added to ${year} – Section ${section}!`, 'success', 5000);
+    Utils.modal.close('addClassModal');
+    // Update the class selector and reload table
+    const clsSel = document.getElementById('stuClass');
+    if (clsSel) {
+      clsSel.value = `${year}__${section}`;
+      await loadStudentTable();
+    }
+  }
+  if (failed > 0) {
+    AttendX.toast.show(`${failed} student(s) could not be saved. Check console.`, 'error', 5000);
+  }
+}
+
+
 let _editableTT = {};
 
 async function showTimetable() {
@@ -1126,10 +1552,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   const main = document.querySelector('.main-content');
   if (main) main.style.opacity = '0.5';
 
+  const banner = document.getElementById('dbErrBanner');
+  if (banner) {
+    banner.style.display = 'none'; // Default to hidden, show only on connection error
+  }
+
+  // Hook connection change listener to dynamically show/hide the banner
+  AttendX.connection.onChange((state) => {
+    const bannerEl = document.getElementById('dbErrBanner');
+    if (bannerEl) {
+      bannerEl.style.display = (state === 'connected') ? 'none' : 'block';
+    }
+  });
+
   await AttendX.init();
-  if (!AttendX.connection.isConnected()) {
-    const banner = document.getElementById('dbErrBanner');
-    if (banner) banner.style.display = 'block';
+  if (banner) {
+    banner.style.display = AttendX.connection.isConnected() ? 'none' : 'block';
   }
 
   if (main) main.style.opacity = '1';

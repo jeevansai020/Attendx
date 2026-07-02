@@ -546,8 +546,8 @@ const AttendX = (function () {
   async function init() {
     _setConnState('connecting');
     try {
-      // Race Supabase against a 6-second timeout
-      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 6000));
+      // Race Supabase against a 20-second timeout to handle cold-starts
+      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 20000));
       const queries = Promise.all([
         _sb.from('classes').select('*').eq('is_active', true),
         _sb.from('subjects').select('*').eq('is_active', true),

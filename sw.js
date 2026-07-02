@@ -3,9 +3,9 @@
  * Strategy: Cache-First for static assets, Network-First for API/dynamic
  */
 
-const CACHE_NAME = 'attendx-v1.0';
-const STATIC_CACHE = 'attendx-static-v1.0';
-const DYNAMIC_CACHE = 'attendx-dynamic-v1.0';
+const CACHE_NAME = 'attendx-v1.1';
+const STATIC_CACHE = 'attendx-static-v1.1';
+const DYNAMIC_CACHE = 'attendx-dynamic-v1.1';
 
 // Core assets to pre-cache on install
 const PRECACHE_ASSETS = [
