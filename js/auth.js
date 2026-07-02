@@ -4,6 +4,7 @@
  * NOTE: auth.js is currently NOT loaded by index.html or dashboard.html.
  *       The app uses AttendX.auth directly. This file is kept for future use.
  */
+/* global AttendX */
 const Auth = (function () {
   'use strict';
 

@@ -223,11 +223,39 @@
 }
 @media(max-width:480px){.stats-grid{grid-template-columns:1fr;}}
 /* STUDENT STATUS BUTTONS (inline P/A buttons in attendance list) */
-.student-status-btn{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;border:1.5px solid transparent;transition:all var(--transition);cursor:pointer;}
+.student-status-btn{display:inline-flex;align-items:center;gap:5px;width:auto;min-width:30px;height:30px;padding:0 8px;border-radius:7px;font-size:12px;font-weight:800;border:1.5px solid transparent;transition:all var(--transition);cursor:pointer;}
+.student-status-btn .sbtn-name{font-size:11px;font-weight:600;max-width:0;overflow:hidden;white-space:nowrap;transition:max-width .2s ease,opacity .2s ease;opacity:0;}
+@media(min-width:900px){.student-status-btn .sbtn-name{max-width:120px;opacity:1;}}
 .student-status-btn.present-btn{background:var(--success-light);color:#065f46;border-color:rgba(16,185,129,.3);}
 .student-status-btn.present-btn:hover{background:var(--success);color:#fff;border-color:var(--success);}
 .student-status-btn.absent-btn{background:var(--danger-light);color:#991b1b;border-color:rgba(239,68,68,.3);}
 .student-status-btn.absent-btn:hover{background:var(--danger);color:#fff;border-color:var(--danger);}
+.student-mark-wrap{display:flex;gap:5px;align-items:center;}
+.student-list-wrap{margin-top:8px;}
+/* ATTENDANCE ACTIVE CARD */
+.att-active-card{background:linear-gradient(135deg,var(--primary-light),rgba(139,92,246,.1));border:2px solid var(--primary);border-radius:16px;padding:20px;margin-bottom:12px;position:sticky;top:0;z-index:10;}
+.att-active-meta{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.att-active-idx{font-size:12px;font-weight:700;color:var(--primary);white-space:nowrap;}
+.att-progress-bar{flex:1;height:5px;border-radius:99px;background:rgba(99,102,241,.15);overflow:hidden;}
+.att-progress-fill{height:100%;background:var(--primary);border-radius:99px;transition:width .4s ease;}
+.att-active-student{display:flex;align-items:center;gap:16px;margin-bottom:16px;}
+.att-active-avatar{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.att-active-info{flex:1;}
+.att-active-name{font-size:18px;font-weight:800;color:var(--text-primary);line-height:1.2;}
+.att-active-roll{font-size:13px;font-weight:600;color:var(--primary);margin-top:2px;font-family:monospace;}
+.att-active-status{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:800;flex-shrink:0;}
+.att-active-status.status-p{background:var(--success-light);color:#065f46;}
+.att-active-status.status-a{background:var(--danger-light);color:#991b1b;}
+.att-active-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.att-mark-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:14px 10px;border-radius:12px;border:2px solid transparent;font-family:var(--font);cursor:pointer;transition:all .15s ease;}
+.att-mark-label{font-size:24px;font-weight:900;line-height:1;}
+.att-mark-sub{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+.att-mark-btn.att-mark-p{background:var(--success-light);color:#065f46;border-color:rgba(16,185,129,.3);}
+.att-mark-btn.att-mark-p:hover,.att-mark-btn.att-mark-p.active{background:var(--success);color:#fff;border-color:var(--success);transform:translateY(-2px);box-shadow:0 6px 20px rgba(16,185,129,.35);}
+.att-mark-btn.att-mark-a{background:var(--danger-light);color:#991b1b;border-color:rgba(239,68,68,.3);}
+.att-mark-btn.att-mark-a:hover,.att-mark-btn.att-mark-a.active{background:var(--danger);color:#fff;border-color:var(--danger);transform:translateY(-2px);box-shadow:0 6px 20px rgba(239,68,68,.35);}
+.att-active-nav{display:flex;gap:8px;justify-content:space-between;}
+.att-active-nav .btn:disabled{opacity:.35;}
 /* PCT RING (circular-style percentage badge used in reports/students) */
 .pct-ring{display:inline-flex;align-items:center;justify-content:center;min-width:52px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:800;}
 .pct-ring.pct-high{background:var(--success-light);color:#065f46;}

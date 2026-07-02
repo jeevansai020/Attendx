@@ -1,6 +1,15 @@
 /**
  * AttendX – App Core v2.0 (Supabase + Real-time + Extra Classes)
+ *
+ * @file app.js
+ * Globals provided by previously loaded scripts:
+ *   - AttendX  (js/db-supabase.js)
+ *   - Utils    (js/utils.js)
+ *   - Nav      (defined in this file)
+ *
+ * @typedef {import('./globals.d.ts')} Globals
  */
+/* global AttendX, Utils */
 
 // ==================== BOOT ====================
 if (document.getElementById('dashboardApp')) {
@@ -68,10 +77,7 @@ function initNavbar() {
   ['sidebarAvatar'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = session.initials || session.name.slice(0,2).toUpperCase(); });
   const dateEl = document.getElementById('todayDate');
   if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
-  // Support both themeToggle and themeBtn IDs
-  ['themeToggle','themeBtn'].forEach(id => {
-    document.getElementById(id)?.addEventListener('click', () => { const n = AttendX.theme.toggle(); updateThemeIcon(n); });
-  });
+  // themeBtn has inline onclick="toggleTheme()" — no extra listener needed
   updateThemeIcon(AttendX.theme.get());
   // Greeting
   const greet = document.getElementById('greetingText');
@@ -79,7 +85,8 @@ function initNavbar() {
 }
 
 function updateThemeIcon(theme) {
-  const btn = document.getElementById('themeToggle');
+  // Support both ID variants in different HTML templates
+  const btn = document.getElementById('themeBtn') || document.getElementById('themeToggle');
   if (!btn) return;
   btn.innerHTML = theme === 'dark'
     ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`
@@ -277,7 +284,43 @@ function renderAttendanceList() {
   if (ctxEl) ctxEl.textContent = `${_attContext.year} – Section ${_attContext.section} | ${_attContext.subject}${isExtra ? ' ⚡ Extra' : ''} | ${AttendX.utils.formatDate(_attContext.date)}`;
   const totEl = document.getElementById('attTotalCount');
   if (totEl) totEl.textContent = _classStudents.length;
-  container.innerHTML = _classStudents.map((s, idx) => {
+
+  // ── Active (current) student card at top of list ──────────────────────
+  const cur = _classStudents[_currentIdx];
+  const curStatus = cur ? (_records[cur.rollNo] || '') : '';
+  const progressPct = _classStudents.length ? Math.round((_currentIdx / _classStudents.length) * 100) : 0;
+  const activeCard = cur ? `
+    <div class="att-active-card" id="attActiveCard">
+      <div class="att-active-meta">
+        <span class="att-active-idx">${_currentIdx + 1} / ${_classStudents.length}</span>
+        <div class="att-progress-bar"><div class="att-progress-fill" style="width:${progressPct}%"></div></div>
+      </div>
+      <div class="att-active-student">
+        <div class="att-active-avatar">${cur.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase()}</div>
+        <div class="att-active-info">
+          <div class="att-active-name">${cur.name}</div>
+          <div class="att-active-roll">${cur.rollNo}</div>
+        </div>
+        ${curStatus ? `<span class="att-active-status ${curStatus === 'P' ? 'status-p' : 'status-a'}">${curStatus === 'P' ? '✓ Present' : '✗ Absent'}</span>` : ''}
+      </div>
+      <div class="att-active-btns">
+        <button class="att-mark-btn att-mark-p ${curStatus === 'P' ? 'active' : ''}" onclick="markStudent(${_currentIdx},'P')">
+          <span class="att-mark-label">P</span>
+          <span class="att-mark-sub">Present</span>
+        </button>
+        <button class="att-mark-btn att-mark-a ${curStatus === 'A' ? 'active' : ''}" onclick="markStudent(${_currentIdx},'A')">
+          <span class="att-mark-label">A</span>
+          <span class="att-mark-sub">Absent</span>
+        </button>
+      </div>
+      <div class="att-active-nav">
+        <button class="btn btn-ghost btn-sm" onclick="setCurrentStudent(Math.max(${_currentIdx}-1,0))" ${_currentIdx === 0 ? 'disabled' : ''}>↑ Prev</button>
+        <button class="btn btn-ghost btn-sm" onclick="setCurrentStudent(Math.min(${_currentIdx}+1,${_classStudents.length-1}))" ${_currentIdx === _classStudents.length-1 ? 'disabled' : ''}>Next ↓</button>
+      </div>
+    </div>` : '';
+
+  // ── Full student list below ────────────────────────────────────────────
+  const listRows = _classStudents.map((s, idx) => {
     const status = _records[s.rollNo] || '';
     let rowClass = 'student-row';
     if (idx === _currentIdx) rowClass += ' current-row';
@@ -286,13 +329,21 @@ function renderAttendanceList() {
     return `<div class="${rowClass}" id="srow-${idx}" onclick="setCurrentStudent(${idx})">
       <span class="student-roll">${s.rollNo}</span>
       <span class="student-name">${s.name}</span>
-      <div style="display:flex;gap:6px;align-items:center">
-        ${status ? `<span class="badge ${status === 'P' ? 'badge-success' : 'badge-danger'}">${status === 'P' ? 'Present' : 'Absent'}</span>` : '<span class="badge" style="background:var(--bg-muted);color:var(--text-muted)">Pending</span>'}
-        <button class="student-status-btn present-btn" onclick="event.stopPropagation();markStudent(${idx},'P')">P</button>
-        <button class="student-status-btn absent-btn"  onclick="event.stopPropagation();markStudent(${idx},'A')">A</button>
+      <div class="student-mark-wrap">
+        ${status
+          ? `<span class="badge ${status === 'P' ? 'badge-success' : 'badge-danger'}">${status === 'P' ? 'Present' : 'Absent'}</span>`
+          : '<span class="badge" style="background:var(--bg-muted);color:var(--text-muted)">Pending</span>'}
+        <button class="student-status-btn present-btn" onclick="event.stopPropagation();markStudent(${idx},'P')" title="Mark Present (P)">
+          <span>P</span><span class="sbtn-name">${s.name}</span>
+        </button>
+        <button class="student-status-btn absent-btn" onclick="event.stopPropagation();markStudent(${idx},'A')" title="Mark Absent (A)">
+          <span>A</span><span class="sbtn-name">${s.name}</span>
+        </button>
       </div>
     </div>`;
   }).join('');
+
+  container.innerHTML = activeCard + `<div class="student-list-wrap">${listRows}</div>`;
   scrollToCurrentRow();
 }
 
@@ -768,8 +819,8 @@ function showSettings() {
 }
 
 // ==================== MODALS ====================
-function openModal(id)  { Utils?.modal?.open(id)  || document.getElementById(id)?.classList.add('active'); }
-function closeModal(id) { Utils?.modal?.close(id) || document.getElementById(id)?.classList.remove('active'); }
+function openModal(id)  { if (Utils?.modal) Utils.modal.open(id);  else document.getElementById(id)?.classList.add('active'); }
+function closeModal(id) { if (Utils?.modal) Utils.modal.close(id); else document.getElementById(id)?.classList.remove('active'); }
 
 // ==================== MISSING GLOBAL FUNCTIONS ====================
 // Sidebar / mobile menu
@@ -801,6 +852,14 @@ function closeSearch() {
   const ov = document.getElementById('searchOverlay');
   if (ov) ov.classList.remove('active');
 }
+// Close search when clicking the backdrop (outside the search-box)
+document.addEventListener('click', (e) => {
+  const ov = document.getElementById('searchOverlay');
+  if (ov && ov.classList.contains('active')) {
+    // If click target is the overlay itself (not inside .search-box), close it
+    if (!e.target.closest('.search-box')) closeSearch();
+  }
+});
 document.addEventListener('keydown', (e) => {
   if ((e.ctrlKey||e.metaKey) && e.key==='k') { e.preventDefault(); openSearch(); }
   if (e.key==='Escape') closeSearch();

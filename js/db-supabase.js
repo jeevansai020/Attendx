@@ -10,6 +10,7 @@
  *  - onConnStateChange(fn) callback hook for UI badges
  *  - Graceful error handling when Supabase is unreachable
  */
+/* global SUPABASE_URL, SUPABASE_ANON_KEY */
 const AttendX = (function () {
   'use strict';
 
