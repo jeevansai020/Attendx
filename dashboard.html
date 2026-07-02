@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>AttendX – Dashboard</title>
+  <meta name="description" content="AttendX Academic ERP Dashboard"/>
+  <meta name="theme-color" content="#6366f1"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <!-- PWA: Apple & Android/Windows meta -->
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="AttendX"/>
+  <link rel="apple-touch-icon" href="assets/icon-192.png"/>
+  <meta name="msapplication-TileImage" content="assets/icon-192.png"/>
+  <meta name="msapplication-TileColor" content="#0f172a"/>
+  <meta name="msapplication-navbutton-color" content="#6366f1"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles/main.css"/>
+  <link rel="stylesheet" href="styles/dashboard.css"/>
+</head>
+<body id="dashboardApp">
+<div id="toastContainer"></div>
+<div id="dbErrBanner">⚠ Cannot reach database – some features may be limited. <button onclick="location.reload()" style="margin-left:12px;background:rgba(255,255,255,.2);border:none;color:#fff;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:12px">Retry</button></div>
+
+<!-- SEARCH OVERLAY -->
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-box">
+    <div class="search-input-wrap">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Search students, faculty, subjects…" autocomplete="off"/>
+      <button class="btn btn-ghost btn-sm" onclick="closeSearch()">ESC</button>
+    </div>
+    <div class="search-results" id="searchResults"><div class="empty-state" style="padding:24px"><div class="empty-icon">🔍</div><p>Type to search…</p></div></div>
+  </div>
+</div>
+
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon-sm">
+        <svg width="20" height="20" viewBox="0 0 40 40" fill="none"><path d="M8 28V16l12-8 12 8v12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="15" y="20" width="10" height="8" rx="2" stroke="white" stroke-width="2.5"/><circle cx="20" cy="14" r="2" fill="white"/></svg>
+      </div>
+      <span class="brand-name">AttendX</span>
+      <button class="sidebar-toggle-btn" id="sidebarCollapseBtn" onclick="toggleSidebar()" title="Collapse">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebarAvatar">FA</div>
+      <div class="user-info">
+        <strong id="sidebarName">Faculty</strong>
+        <span id="sidebarRole">Department</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-label">Main</div>
+        <div class="nav-item active" data-page="dashboard">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span class="nav-label">Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="attendance">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span class="nav-label">Take Attendance</span>
+        </div>
+        <div class="nav-item" data-page="extra-classes">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          <span class="nav-label">Extra Classes</span>
+        </div>
+        <div class="nav-item" data-page="timetable">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span class="nav-label">Timetable</span>
+        </div>
+      </div>
+      <div class="nav-section" id="navManage">
+        <div class="nav-section-label">Manage</div>
+        <div class="nav-item" data-page="students">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span class="nav-label">Students</span>
+        </div>
+        <div class="nav-item" data-page="coverage">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span class="nav-label">Syllabus Coverage</span>
+        </div>
+        <div class="nav-item" data-page="corrections" id="navCorrections">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span class="nav-label">Corrections</span>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Analytics</div>
+        <div class="nav-item" data-page="calendar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span class="nav-label">Calendar</span>
+        </div>
+        <div class="nav-item" data-page="reports">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span class="nav-label">Reports</span>
+        </div>
+        <div class="nav-item" data-page="analytics" id="navAnalytics">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span class="nav-label">Analytics</span>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Account</div>
+        <div class="nav-item" data-page="notifications">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="nav-label">Notifications</span>
+          <span class="badge badge-danger" id="sidebarNotifBadge" style="display:none"></span>
+        </div>
+        <div class="nav-item" data-page="settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 19.07l-1.41 1.41M19.07 19.07l-1.41-1.41M4.93 4.93l1.41 1.41M21 12h-2M5 12H3M12 21v-2M12 5V3"/></svg>
+          <span class="nav-label">Settings</span>
+        </div>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="nav-item" id="logoutBtn" style="color:var(--danger)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span class="nav-label">Logout</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <!-- NAVBAR -->
+    <header class="navbar">
+      <div class="navbar-left">
+        <button class="mobile-menu-btn icon-btn" id="mobileMenuBtn" onclick="toggleMobileSidebar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="breadcrumb">
+          <span class="breadcrumb-item">AttendX</span>
+          <span class="breadcrumb-sep">/</span>
+          <span class="breadcrumb-item active" id="breadcrumb">Dashboard</span>
+        </div>
+      </div>
+      <div class="navbar-right">
+        <span class="today-date" id="todayDate"></span>
+        <span class="rt-dot" id="rtDot" title="Realtime: Connecting"></span>
+        <button class="icon-btn" onclick="openSearch()" title="Search (Ctrl+K)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+        <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle Theme">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn" id="notifBtn" onclick="Nav.go('notifications')" title="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-badge hidden" id="notifBadge">0</span>
+        </button>
+        <div class="navbar-profile" onclick="Nav.go('settings')">
+          <div class="user-avatar" style="width:32px;height:32px;font-size:11px" id="navAvatar">FA</div>
+          <div class="navbar-profile-info">
+            <strong id="navName">Faculty</strong>
+            <span id="navRole">Role</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="page-content" id="pageContent">
+
+<!-- DASHBOARD PAGE -->
+<section class="page-section" id="page-dashboard">
+  <div class="greeting-banner">
+    <div class="greeting-text">
+      <h2 id="greetingText">Good Morning, Faculty 👋</h2>
+      <p id="greetingSub">Here's your academic overview for today</p>
+    </div>
+    <button class="btn btn-primary" onclick="Nav.go('attendance')" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3);backdrop-filter:blur(4px)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>
+      Take Attendance
+    </button>
+  </div>
+  <div id="alertBanners"></div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-icon blue"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div><div class="stat-number" id="statTotal">–</div><div class="stat-label">Today's Classes</div></div></div>
+    <div class="stat-card"><div class="stat-icon green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg></div><div><div class="stat-number" id="statDone">–</div><div class="stat-label">Attendance Taken</div></div></div>
+    <div class="stat-card"><div class="stat-icon orange"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div><div class="stat-number" id="statPending">–</div><div class="stat-label">Pending</div></div></div>
+    <div class="stat-card"><div class="stat-icon red"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="23" y1="3" x2="17" y2="9"/></svg></div><div><div class="stat-number" id="statAbsent">–</div><div class="stat-label">Absentees Today</div></div></div>
+    <div class="stat-card"><div class="stat-icon purple"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div><div class="stat-number" id="statDays">–</div><div class="stat-label">Days Recorded</div></div></div>
+  </div>
+  <div class="dash-grid">
+    <div class="card">
+      <div class="card-header"><h3>📅 Today's Schedule</h3><button class="btn btn-secondary btn-sm" onclick="Nav.go('timetable')">View All</button></div>
+      <div class="card-body" style="padding:12px 16px"><div id="todaySchedule"><div class="loading-state"><div class="spinner spinner-dark"></div><span>Loading schedule…</span></div></div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card">
+        <div class="card-header"><h3>⚡ Quick Actions</h3></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-primary btn-full" onclick="Nav.go('attendance')">Take Attendance</button>
+          <button class="btn btn-secondary btn-full" onclick="Nav.go('reports')">View Reports</button>
+          <button class="btn btn-secondary btn-full" onclick="Nav.go('coverage')">Syllabus Coverage</button>
+          <button class="btn btn-secondary btn-full" onclick="Nav.go('students')">Manage Students</button>
+          <button class="btn btn-secondary btn-full" onclick="Nav.go('calendar')">Attendance Calendar</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>📆 Upcoming</h3></div>
+        <div class="card-body" id="upcomingSection" style="font-size:13px;color:var(--text-muted)">Loading…</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ATTENDANCE PAGE -->
+<section class="page-section hidden" id="page-attendance">
+  <div class="page-header">
+    <div><div class="page-title">Take Attendance</div><div class="page-subtitle">Select class → Load students → Mark P/A → Save</div></div>
+  </div>
+  <div id="attSelectorPanel">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header"><h3>Select Class &amp; Subject</h3></div>
+      <div class="card-body">
+        <div class="att-selector">
+          <div class="form-group" style="margin:0"><label class="form-label">Class</label><select id="attClass" class="form-control"><option value="">Select Class</option></select></div>
+          <div class="form-group" style="margin:0"><label class="form-label">Subject</label><select id="attSubject" class="form-control" disabled><option value="">Select Subject</option></select></div>
+          <div class="form-group" style="margin:0"><label class="form-label">Date</label><input type="date" id="attDate" class="form-control"/></div>
+          <div style="padding-top:22px"><button class="btn btn-primary" id="loadStudentsBtn">Load Students</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="attMainPanel" class="hidden">
+    <div class="count-bar">
+      <div class="count-item count-present"><span class="count-num" id="cntPresent">0</span><span>Present</span></div>
+      <div style="width:1px;height:30px;background:var(--border)"></div>
+      <div class="count-item count-absent"><span class="count-num" id="cntAbsent">0</span><span>Absent</span></div>
+      <div style="width:1px;height:30px;background:var(--border)"></div>
+      <div class="count-item count-pending"><span class="count-num" id="cntPending">0</span><span>Pending</span></div>
+      <div class="kbd-hints">
+        <span class="kbd-hint"><span class="kbd">P</span> Present</span>
+        <span class="kbd-hint"><span class="kbd">A</span> Absent</span>
+        <span class="kbd-hint"><span class="kbd">↑↓</span> Navigate</span>
+      </div>
+      <button class="btn btn-success btn-sm" style="margin-left:auto" id="saveAttBtn">💾 Save</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetAttUI()">← Back</button>
+    </div>
+    <div class="card">
+      <div class="card-body" style="padding:12px 16px">
+        <div style="font-weight:700;font-size:14px;color:var(--text-primary);margin-bottom:8px" id="attContextLabel"></div>
+        <div class="student-list-header"><span>Roll No</span><span>Name</span><span>Status</span><span>Mark</span></div>
+        <div id="studentListContainer" style="max-height:55vh;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+  <div id="attSummaryPanel" class="hidden">
+    <div class="summary-panel">
+      <div class="summary-header">
+        <h3 id="sumSubject">Subject</h3>
+        <p id="sumClassLabel" style="opacity:.8;margin-top:4px"></p>
+        <div class="summary-stats">
+          <div class="summary-stat"><div class="summary-stat-num" id="sumTotal">0</div><div class="summary-stat-label">Total</div></div>
+          <div class="summary-stat"><div class="summary-stat-num" id="sumPresent">0</div><div class="summary-stat-label">Present</div></div>
+          <div class="summary-stat"><div class="summary-stat-num" id="sumAbsent">0</div><div class="summary-stat-label">Absent</div></div>
+        </div>
+      </div>
+      <div class="summary-body">
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="editAttendance()">✏ Edit</button>
+          <button class="btn btn-primary btn-sm" onclick="resetAttUI()">Take Another</button>
+          <button class="btn btn-ghost btn-sm" id="waBtn" onclick="toggleWABox()">📲 WhatsApp</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportAttCSV()">⬇ CSV</button>
+        </div>
+        <div id="absenteeList"></div>
+        <div class="wa-box hidden" id="waBox">
+          <div class="wa-preview" id="waPreview"></div>
+          <div class="wa-actions">
+            <button class="btn btn-secondary btn-sm" onclick="copyWA()">📋 Copy</button>
+            <button class="btn btn-success btn-sm" onclick="shareWA()">💬 Share on WhatsApp</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STUDENTS PAGE -->
+<section class="page-section hidden" id="page-students">
+  <div class="page-header">
+    <div><div class="page-title">Student Management</div><div class="page-subtitle">View, search, and manage students</div></div>
+    <div class="page-actions"><button class="btn btn-primary" onclick="Utils.modal.open('addStudentModal')">+ Add Student</button></div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-body" style="padding:14px 20px">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+        <div class="form-group" style="margin:0;min-width:220px"><label class="form-label">Class</label><select id="stuClass" class="form-control"><option value="">Select Class</option></select></div>
+        <div class="input-group" style="flex:1;min-width:200px">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="stuSearch" class="form-control" placeholder="Search by name or roll…"/>
+        </div>
+        <button class="btn btn-secondary" onclick="exportStudentsCSV()">⬇ CSV</button>
+      </div>
+    </div>
+  </div>
+  <div class="card"><div style="overflow-x:auto">
+    <table class="data-table">
+      <thead><tr><th>#</th><th>Roll No</th><th>Name</th><th>Total</th><th>Present</th><th>Absent</th><th>%</th><th>Actions</th></tr></thead>
+      <tbody id="stuTableBody"><tr><td colspan="8" class="empty-state">Select a class to view students</td></tr></tbody>
+    </table>
+  </div></div>
+</section>
+
+<!-- TIMETABLE PAGE -->
+<section class="page-section hidden" id="page-timetable">
+  <div class="page-header">
+    <div><div class="page-title">Weekly Timetable</div><div class="page-subtitle">Your scheduled classes for the week</div></div>
+    <div class="page-actions"><button class="btn btn-primary" id="saveTimetableBtn">💾 Save Timetable</button></div>
+  </div>
+  <div class="card"><div class="card-body" style="overflow-x:auto"><div class="tt-grid" id="ttGrid"></div></div></div>
+</section>
+
+<!-- EXTRA CLASSES PAGE -->
+<section class="page-section hidden" id="page-extra-classes">
+  <div class="page-header">
+    <div><div class="page-title">Extra Classes</div><div class="page-subtitle">Schedule and manage additional classes</div></div>
+    <div class="page-actions"><button class="btn btn-primary" id="scheduleExtraBtn">+ Schedule Extra Class</button></div>
+  </div>
+  <div id="extraClassList"><div class="loading-state"><div class="spinner spinner-dark"></div><span>Loading…</span></div></div>
+</section>
+
+<!-- CALENDAR PAGE -->
+<section class="page-section hidden" id="page-calendar">
+  <div class="page-header"><div><div class="page-title">Attendance Calendar</div><div class="page-subtitle">Green = recorded · Red = holiday</div></div></div>
+  <div style="display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start">
+    <div class="card">
+      <div class="card-header">
+        <button class="btn btn-secondary btn-sm" id="calPrev">‹</button>
+        <h3 id="calTitle" style="flex:1;text-align:center"></h3>
+        <button class="btn btn-secondary btn-sm" id="calNext">›</button>
+      </div>
+      <div class="card-body"><div class="cal-grid" id="calGrid"></div></div>
+    </div>
+    <div id="calDetail"><div class="card"><div class="card-body empty-state"><div class="empty-icon">📅</div><div class="empty-title">Click a date</div><p>to view attendance details</p></div></div></div>
+  </div>
+</section>
+
+<!-- REPORTS PAGE -->
+<section class="page-section hidden" id="page-reports">
+  <div class="page-header"><div><div class="page-title">Attendance Reports</div><div class="page-subtitle">Generate and export reports</div></div></div>
+  <div class="filter-bar">
+    <div class="form-group"><label class="form-label">Type</label><select id="repType" class="form-control" style="min-width:160px"><option value="classwise">Class-wise</option><option value="studentwise">Student-wise</option><option value="low">Low Attendance</option></select></div>
+    <div class="form-group"><label class="form-label">Class</label><select id="repClass" class="form-control" style="min-width:180px"><option value="">All Classes</option></select></div>
+    <div class="form-group"><label class="form-label">From</label><input type="date" id="repFrom" class="form-control"/></div>
+    <div class="form-group"><label class="form-label">To</label><input type="date" id="repTo" class="form-control"/></div>
+    <button class="btn btn-primary" onclick="generateReport()">Generate</button>
+    <div class="export-btns">
+      <button class="btn btn-secondary" onclick="exportRepCSV()">⬇ CSV</button>
+      <button class="btn btn-secondary" onclick="window.print()">🖨 PDF</button>
+    </div>
+  </div>
+  <div class="card" style="overflow-x:auto">
+    <table class="data-table" id="repTable">
+      <thead id="repHead"><tr><th colspan="8" style="text-align:center;padding:24px;color:var(--text-muted)">Select filters and click Generate</th></tr></thead>
+      <tbody id="repBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ANALYTICS PAGE -->
+<section class="page-section hidden" id="page-analytics">
+  <div class="page-header"><div><div class="page-title">Analytics</div><div class="page-subtitle">Department & faculty performance overview</div></div></div>
+  <div class="stats-grid" id="analyticsStats"></div>
+  <div class="analytics-grid" style="margin-top:20px">
+    <div class="card"><div class="card-header"><h3>📉 Low Attendance</h3><select id="lowAttFilter" class="form-control btn-sm" style="width:auto"><option value="75">Below 75%</option><option value="65">Below 65%</option><option value="50">Below 50%</option></select></div><div class="card-body" id="lowAttTable" style="padding:0"></div></div>
+    <div class="card"><div class="card-header"><h3>👩‍🏫 Faculty Workload</h3></div><div class="card-body" id="workloadList" style="padding:0"></div></div>
+  </div>
+</section>
+
+<!-- COVERAGE PAGE -->
+<section class="page-section hidden" id="page-coverage">
+  <div class="page-header">
+    <div><div class="page-title">Syllabus Coverage</div><div class="page-subtitle">Track unit-wise topic completion</div></div>
+    <div class="page-actions"><button class="btn btn-primary" onclick="Utils.modal.open('addUnitModal')">+ Add Unit</button></div>
+  </div>
+  <div class="form-group" style="max-width:360px;margin-bottom:20px">
+    <label class="form-label">Select Subject (Mapping)</label>
+    <select id="coverageMapping" class="form-control"></select>
+  </div>
+  <div id="coverageList" class="analytics-grid"></div>
+</section>
+
+<!-- NOTIFICATIONS PAGE -->
+<section class="page-section hidden" id="page-notifications">
+  <div class="page-header">
+    <div><div class="page-title">Notifications</div><div class="page-subtitle">Your recent alerts and reminders</div></div>
+    <div class="page-actions"><button class="btn btn-secondary" onclick="markAllNotifRead()">Mark All Read</button></div>
+  </div>
+  <div class="card" id="notifList"><div class="loading-state"><div class="spinner spinner-dark"></div><span>Loading…</span></div></div>
+</section>
+
+<!-- CORRECTIONS PAGE -->
+<section class="page-section hidden" id="page-corrections">
+  <div class="page-header">
+    <div><div class="page-title">Attendance Corrections</div><div class="page-subtitle">Review and approve correction requests</div></div>
+    <div class="page-actions"><button class="btn btn-primary" onclick="Utils.modal.open('correctionModal')">+ Request Correction</button></div>
+  </div>
+  <div id="correctionList"><div class="loading-state"><div class="spinner spinner-dark"></div><span>Loading…</span></div></div>
+</section>
+
+<!-- SETTINGS PAGE -->
+<section class="page-section hidden" id="page-settings">
+  <div class="page-header"><div><div class="page-title">Settings</div><div class="page-subtitle">Account & preferences</div></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:900px">
+    <div class="card">
+      <div class="card-header"><h3>Profile</h3></div>
+      <div class="card-body">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+          <div class="user-avatar" style="width:56px;height:56px;font-size:18px;border-radius:16px" id="settingsAvatar">FA</div>
+          <div>
+            <div style="font-size:18px;font-weight:800" id="settingsName">Faculty</div>
+            <div style="font-size:13px;color:var(--text-muted)" id="settingsDept"></div>
+            <div style="font-size:12px;color:var(--text-muted)" id="settingsRole"></div>
+            <div style="font-size:12px;color:var(--text-muted)" id="settingsEmail"></div>
+            <div style="font-size:12px;color:var(--text-muted)" id="settingsEmpId"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Appearance</h3></div>
+      <div class="card-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div><div style="font-weight:600;font-size:14px">Dark Mode</div><div style="font-size:12px;color:var(--text-muted)">Toggle light/dark theme</div></div>
+          <button class="btn btn-secondary btn-sm" onclick="toggleTheme()">Toggle Theme</button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div><div style="font-weight:600;font-size:14px">Install App</div><div style="font-size:12px;color:var(--text-muted)">Add to home screen (PWA)</div></div>
+          <button class="btn btn-primary btn-sm" id="installBtn" style="display:none">Install</button>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="grid-column:1/-1">
+      <div class="card-header"><h3>Semester Info</h3></div>
+      <div class="card-body" id="semesterInfo" style="font-size:14px;color:var(--text-muted)">Loading…</div>
+    </div>
+    <div class="card" style="grid-column:1/-1">
+      <div class="card-header"><h3>Danger Zone</h3></div>
+      <div class="card-body">
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">All data is stored in Supabase cloud. Real-time sync active.</p>
+        <button class="btn btn-danger btn-sm" onclick="doLogout()">Sign Out</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="addStudentModal">
+  <div class="modal">
+    <div class="modal-header"><h3>Add Student</h3><button class="modal-close" onclick="Utils.modal.close('addStudentModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Roll Number *</label><input type="text" id="newRollNo" class="form-control" placeholder="e.g. 21CS001"/></div>
+      <div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="newStudentName" class="form-control" placeholder="Student full name"/></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="Utils.modal.close('addStudentModal')">Cancel</button><button class="btn btn-primary" onclick="saveStudent()">Add Student</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addUnitModal">
+  <div class="modal">
+    <div class="modal-header"><h3>Add / Edit Unit</h3><button class="modal-close" onclick="Utils.modal.close('addUnitModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Unit Number *</label><input type="number" id="unitNum" class="form-control" min="1" max="10"/></div>
+      <div class="form-group"><label class="form-label">Unit Title *</label><input type="text" id="unitTitle" class="form-control" placeholder="e.g. Network Layer"/></div>
+      <div class="form-group"><label class="form-label">Topics Planned</label><input type="number" id="unitPlanned" class="form-control" value="0" min="0"/></div>
+      <div class="form-group"><label class="form-label">Topics Completed</label><input type="number" id="unitCompleted" class="form-control" value="0" min="0"/></div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea id="unitNotes" class="form-control" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="Utils.modal.close('addUnitModal')">Cancel</button><button class="btn btn-primary" onclick="saveCoverageUnit()">Save Unit</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="correctionModal">
+  <div class="modal">
+    <div class="modal-header"><h3>Request Attendance Correction</h3><button class="modal-close" onclick="Utils.modal.close('correctionModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Roll Number *</label><input type="text" id="corrRollNo" class="form-control" placeholder="Student roll number"/></div>
+      <div class="form-group"><label class="form-label">Date *</label><input type="date" id="corrDate" class="form-control"/></div>
+      <div class="form-group"><label class="form-label">Class</label><select id="corrClass" class="form-control"><option value="">Select Class</option></select></div>
+      <div class="form-group"><label class="form-label">New Status</label><select id="corrStatus" class="form-control"><option value="P">Present (P)</option><option value="A">Absent (A)</option></select></div>
+      <div class="form-group"><label class="form-label">Reason *</label><textarea id="corrReason" class="form-control" rows="3" placeholder="Explain reason for correction…"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="Utils.modal.close('correctionModal')">Cancel</button><button class="btn btn-primary" onclick="submitCorrection()">Submit Request</button></div>
+  </div>
+</div>
+
+<!-- TIMETABLE CELL MODAL -->
+<div class="modal-overlay" id="ttCellModal">
+  <div class="modal">
+    <div class="modal-header"><h3>Edit Timetable Slot</h3><span id="ttDay" style="font-size:13px;color:var(--text-muted);font-weight:600"></span><button class="modal-close" onclick="closeModal('ttCellModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Year *</label><select id="ttYear" class="form-control"><option value="">Select Year</option></select></div>
+      <div class="form-group"><label class="form-label">Section *</label><select id="ttSection" class="form-control"><option value="">Section</option></select></div>
+      <div class="form-group"><label class="form-label">Subject *</label><select id="ttSubject" class="form-control"><option value="">Select Subject</option></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="clearTTCellBtn">🗑 Clear</button>
+      <button class="btn btn-secondary" onclick="closeModal('ttCellModal')">Cancel</button>
+      <button class="btn btn-primary" id="saveTTCellBtn">Save Slot</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXTRA CLASS MODAL -->
+<div class="modal-overlay" id="extraClassModal">
+  <div class="modal">
+    <div class="modal-header"><h3>Schedule Extra Class</h3><button class="modal-close" onclick="closeModal('extraClassModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Year *</label><select id="ecYear" class="form-control"><option value="">Select Year</option></select></div>
+      <div class="form-group"><label class="form-label">Section *</label><select id="ecSection" class="form-control"><option value="">Section</option></select></div>
+      <div class="form-group"><label class="form-label">Subject *</label><select id="ecSubject" class="form-control"><option value="">Select Subject</option></select></div>
+      <div class="form-group"><label class="form-label">Date *</label><input type="date" id="ecDate" class="form-control"/></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group" style="margin:0"><label class="form-label">Start Time *</label><input type="time" id="ecStartTime" class="form-control"/></div>
+        <div class="form-group" style="margin:0"><label class="form-label">End Time *</label><input type="time" id="ecEndTime" class="form-control"/></div>
+      </div>
+      <div class="form-group" style="margin-top:12px"><label class="form-label">Reason (optional)</label><textarea id="ecReason" class="form-control" rows="2" placeholder="e.g. Missed class compensation"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('extraClassModal')">Cancel</button>
+      <button class="btn btn-primary" id="saveExtraBtn">Schedule</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI CHATBOT -->
+<button class="chatbot-fab" id="chatbotFab" onclick="toggleChatbot()" title="AI Assistant">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+</button>
+
+<div class="chatbot-window hidden" id="chatbotWindow">
+  <div class="chatbot-header">
+    <div class="chatbot-avatar">🤖</div>
+    <div><div class="chatbot-title">AttendX Assistant</div><div class="chatbot-sub">Ask me anything about AttendX</div></div>
+    <button class="chatbot-close" onclick="toggleChatbot()" style="background:none;border:none;color:#fff;cursor:pointer">✕</button>
+  </div>
+  <div class="chatbot-messages" id="chatMessages">
+    <div class="chat-msg bot">👋 Hi! I'm your AttendX AI Assistant. Ask me about attendance, reports, or how to use the platform!</div>
+  </div>
+  <div class="chatbot-input">
+    <input type="text" id="chatInput" placeholder="Ask anything…" onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button onclick="sendChat()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/db-supabase.js"></script>
+<script src="js/app.js"></script>
+<script src="js/pwa.js"></script>
+</body>
+</html>

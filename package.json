@@ -1,0 +1,13 @@
+{
+  "name": "attendance-system",
+  "version": "1.0.0",
+  "description": "Faculty Attendance Management System",
+  "scripts": {
+    "start": "python3 -m http.server 5500",
+    "dev": "python3 -m http.server 5500",
+    "serve-node": "npx serve . -l 5500"
+  },
+  "devDependencies": {
+    "serve": "^14.2.6"
+  }
+}

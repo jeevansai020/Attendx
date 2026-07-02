@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>AttendX – Academic ERP Platform</title>
+  <meta name="description" content="AttendX: Production-grade academic attendance & faculty productivity platform. Reduce workload 70%."/>
+  <meta name="theme-color" content="#6366f1"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <!-- PWA: Apple & Android/Windows meta -->
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="AttendX"/>
+  <link rel="apple-touch-icon" href="assets/icon-192.png"/>
+  <meta name="msapplication-TileImage" content="assets/icon-192.png"/>
+  <meta name="msapplication-TileColor" content="#0f172a"/>
+  <meta name="msapplication-navbutton-color" content="#6366f1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles/main.css"/>
+  <link rel="stylesheet" href="styles/login.css"/>
+</head>
+<body class="login-body">
+
+<div class="login-wrapper">
+  <!-- ── LEFT: Branding ── -->
+  <div class="login-left">
+    <div class="login-brand">
+      <div class="brand-logo">
+        <svg width="22" height="22" viewBox="0 0 40 40" fill="none">
+          <path d="M8 28V16l12-8 12 8v12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="15" y="20" width="10" height="8" rx="2" stroke="white" stroke-width="2.5"/>
+          <circle cx="20" cy="14" r="2" fill="white"/>
+        </svg>
+      </div>
+      <span class="brand-text">AttendX</span>
+    </div>
+
+    <div class="login-hero">
+      <h1>Academic ERP,<br><span class="gradient-text">Reimagined.</span></h1>
+      <p class="hero-sub">Reduce faculty workload by 70%. Real-time attendance, smart analytics, and automated academic workflows — all in one platform.</p>
+    </div>
+
+    <div class="feature-pills">
+      <div class="feature-pill">
+        <span class="pill-dot" style="background:#10b981"></span>
+        Keyboard-first attendance workflow
+      </div>
+      <div class="feature-pill">
+        <span class="pill-dot" style="background:#6366f1"></span>
+        5 roles: Faculty, HOD, Dean, Admin
+      </div>
+      <div class="feature-pill">
+        <span class="pill-dot" style="background:#f59e0b"></span>
+        Real-time sync & low-attendance alerts
+      </div>
+      <div class="feature-pill">
+        <span class="pill-dot" style="background:#06b6d4"></span>
+        PDF/CSV reports & WhatsApp sharing
+      </div>
+      <div class="feature-pill">
+        <span class="pill-dot" style="background:#ec4899"></span>
+        AI assistant & global search
+      </div>
+    </div>
+
+    <div class="login-metrics">
+      <div class="metric-card">
+        <div class="metric-num">70%</div>
+        <div class="metric-label">Workload Reduction</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num">&lt;30s</div>
+        <div class="metric-label">Avg. Attendance Time</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num">5 Roles</div>
+        <div class="metric-label">Access Levels</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT: Login Form ── -->
+  <div class="login-right">
+    <div class="login-card">
+      <div class="login-card-header">
+        <div class="card-logo">
+          <svg width="18" height="18" viewBox="0 0 40 40" fill="none">
+            <path d="M8 28V16l12-8 12 8v12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="15" y="20" width="10" height="8" rx="2" stroke="white" stroke-width="2.5"/>
+            <circle cx="20" cy="14" r="2" fill="white"/>
+          </svg>
+        </div>
+        <h2>Welcome Back 👋</h2>
+        <p>Sign in to your AttendX account</p>
+      </div>
+
+      <div id="loginAlert" class="login-alert hidden" role="alert">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+        <span id="loginAlertMsg">Invalid credentials.</span>
+      </div>
+
+      <form id="loginForm" class="login-form" autocomplete="off" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="loginEmail">Username or Email</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <input type="text" id="loginEmail" class="form-control" placeholder="dr.kumar or dr.kumar@college.edu"
+                   required autocomplete="username" spellcheck="false"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">Password</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <input type="password" id="loginPassword" class="form-control"
+                   placeholder="Enter your password" required autocomplete="current-password"/>
+            <button type="button" class="pwd-toggle" id="pwdToggle" aria-label="Toggle password visibility">
+              <svg id="eyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="rememberMe"/>
+            <span class="checkbox-custom"></span>
+            Remember me
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full btn-signin" id="loginBtn">
+          <span id="loginBtnText">Sign In</span>
+          <div id="loginSpinner" class="spinner hidden"></div>
+        </button>
+      </form>
+
+      <!-- Connection badge -->
+      <div id="connBadge" class="conn-badge connecting">
+        <span class="conn-dot"></span>
+        <span id="connText">Connecting to server…</span>
+      </div>
+
+      <!-- Demo Accounts -->
+      <div class="demo-section">
+        <p class="demo-title">Demo Accounts</p>
+        <div class="demo-list">
+          <button class="demo-item" onclick="fillDemo('dr.kumar','Faculty@123')" type="button">
+            <div class="demo-avatar" style="background:#6366f1">DK</div>
+            <div class="demo-info">
+              <strong>Dr. Ramesh Kumar</strong>
+              <span>Faculty · CSE</span>
+            </div>
+            <span class="demo-use">Use →</span>
+          </button>
+          <button class="demo-item" onclick="fillDemo('hod.cse','Hod@12345')" type="button">
+            <div class="demo-avatar" style="background:#8b5cf6">AR</div>
+            <div class="demo-info">
+              <strong>Dr. Anitha Rao</strong>
+              <span>HOD · CSE</span>
+            </div>
+            <span class="demo-use">Use →</span>
+          </button>
+          <button class="demo-item" onclick="fillDemo('admin','Admin@123')" type="button">
+            <div class="demo-avatar" style="background:#06b6d4">AD</div>
+            <div class="demo-info">
+              <strong>Admin User</strong>
+              <span>System Admin</span>
+            </div>
+            <span class="demo-use">Use →</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/db-supabase.js"></script>
+<script>
+  // ── Boot ─────────────────────────────────────────────────────
+  Utils.theme.apply();
+
+  // Initialize AttendX data layer
+  AttendX.init();
+
+  // Check if already logged in
+  if (AttendX.auth.isLoggedIn()) {
+    window.location.href = 'dashboard.html';
+  }
+
+  // Connection badge management
+  const badge = document.getElementById('connBadge');
+  const connText = document.getElementById('connText');
+
+  function updateBadge(state) {
+    if (state === 'connected') {
+      badge.className = 'conn-badge connected';
+      connText.textContent = '✓ Connected to database';
+    } else if (state === 'error') {
+      badge.className = 'conn-badge error';
+      connText.textContent = '⚠ Cannot reach database';
+    } else {
+      badge.className = 'conn-badge connecting';
+      connText.textContent = 'Connecting to database…';
+    }
+  }
+
+  // Set initial status and listen for updates
+  updateBadge(AttendX.connection.state());
+  AttendX.connection.onChange((state) => {
+    updateBadge(state);
+  });
+
+  // ── Toggle password visibility ────────────────────────────────
+  document.getElementById('pwdToggle').addEventListener('click', () => {
+    const pwd = document.getElementById('loginPassword');
+    const icon = document.getElementById('eyeIcon');
+    if (pwd.type === 'password') {
+      pwd.type = 'text';
+      icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+    } else {
+      pwd.type = 'password';
+      icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+    }
+  });
+
+  // ── Fill demo credentials ─────────────────────────────────────
+  function fillDemo(email, pass) {
+    document.getElementById('loginEmail').value = email;
+    document.getElementById('loginPassword').value = pass;
+    document.getElementById('loginEmail').focus();
+  }
+
+  // ── Login form submit ─────────────────────────────────────────
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const emailOrUser = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const alertEl  = document.getElementById('loginAlert');
+    const msgEl    = document.getElementById('loginAlertMsg');
+    const btn      = document.getElementById('loginBtn');
+    const btnText  = document.getElementById('loginBtnText');
+    const spinner  = document.getElementById('loginSpinner');
+
+    alertEl.classList.add('hidden');
+    btn.disabled = true;
+    spinner.classList.remove('hidden');
+    btnText.textContent = 'Signing in…';
+
+    try {
+      // Accept both "dr.kumar" and "dr.kumar@college.edu" formats
+      const username = emailOrUser.includes('@') ? emailOrUser.split('@')[0] : emailOrUser;
+      const user = await AttendX.auth.login(username, password);
+      if (!user) {
+        throw new Error('Invalid email or password.');
+      }
+      btnText.textContent = 'Redirecting…';
+      window.location.href = 'dashboard.html';
+    } catch (err) {
+      let msg = err.message || 'Login failed. Please try again.';
+      if (err.message?.includes('fetch') || err.message?.includes('Network')) {
+        msg = 'Network error. Check your connection.';
+      }
+      msgEl.textContent = msg;
+      alertEl.classList.remove('hidden');
+      btn.disabled = false;
+      spinner.classList.add('hidden');
+      btnText.textContent = 'Sign In';
+    }
+  });
+</script>
+<script src="js/pwa.js"></script>
+</body>
+</html>
