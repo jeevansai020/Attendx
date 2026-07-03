@@ -1,14 +1,15 @@
 import http.server
 import socketserver
 import os
+import sys
 
 PORT = 5500
 
 class CleanURLHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
-        # Remove trailing slash if present to normalize path
+        # Remove trailing slash to normalize path
         path_norm = self.path.rstrip('/')
-        if not path_norm:
+        if not path_norm or path_norm == '/':
             path_norm = '/index.html'
 
         # Translate request path to local file path
@@ -22,12 +23,23 @@ class CleanURLHandler(http.server.SimpleHTTPRequestHandler):
 
         return super().do_GET()
 
-# Allow port reuse immediately after killing previous servers
+    def log_message(self, format, *args):
+        # Suppress noisy request logs
+        pass
+
+# Allow immediate port reuse
 socketserver.TCPServer.allow_reuse_address = True
 
-with socketserver.TCPServer(("", PORT), CleanURLHandler) as httpd:
-    print(f"Server started at http://localhost:{PORT}")
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        pass
+try:
+    with socketserver.TCPServer(("", PORT), CleanURLHandler) as httpd:
+        print(f"✅ AttendX dev server running → http://localhost:{PORT}")
+        print("   Press Ctrl+C to stop.\n")
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            print("\n🛑 Server stopped.")
+            sys.exit(0)
+except OSError as e:
+    print(f"\n❌ Could not start server: {e}")
+    print("   Try running:  fuser -k 5500/tcp  then re-run npm run dev")
+    sys.exit(1)

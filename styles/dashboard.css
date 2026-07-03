@@ -1,4 +1,4 @@
-/* AttendX Dashboard v5.0 – Tiimo-Inspired */
+/* AttendX Dashboard v6.0 – Premium Dark UI */
 
 /* ══════════════════════════════════════════════
    TIIMO DESIGN SYSTEM – DAY STRIP
@@ -90,17 +90,18 @@
 
 .tiimo-ring-done {
   fill: none;
-  stroke: var(--tiimo-mint);
+  stroke: var(--primary);
   stroke-width: 16;
   stroke-linecap: round;
   stroke-dasharray: 502.65; /* 2π×80 */
   stroke-dashoffset: 502.65;
   transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1);
+  filter: drop-shadow(0 0 6px rgba(16,185,129,.6));
 }
 
 .tiimo-ring-pending {
   fill: none;
-  stroke: var(--tiimo-purple);
+  stroke: var(--violet);
   stroke-width: 16;
   stroke-linecap: round;
   stroke-dasharray: 502.65;
@@ -280,8 +281,8 @@
 .sidebar {
   width: var(--sidebar-w);
   height: 100vh;
-  background: rgba(255, 255, 255, 0.04);
-  border-right: 1px solid var(--border);
+  background: rgba(5,15,35,.8);
+  border-right: 1px solid rgba(16,185,129,.12);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -290,8 +291,9 @@
   transition: width .25s ease;
   position: relative;
   z-index: 100;
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  box-shadow: 4px 0 24px rgba(0,0,0,.3);
 }
 
 .sidebar.collapsed {
@@ -320,15 +322,15 @@
 }
 
 .brand-icon-sm {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-  border-radius: 9px;
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, #059669, #10b981);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px var(--primary-glow);
+  box-shadow: 0 4px 16px rgba(16,185,129,.5);
 }
 
 .brand-name {
@@ -437,7 +439,7 @@
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(16,185,129,.08);
   color: var(--text-primary);
 }
 
@@ -446,14 +448,16 @@
 }
 
 .nav-item.active {
-  background: var(--primary-light);
+  background: linear-gradient(90deg, rgba(16,185,129,.18), rgba(16,185,129,.06));
   color: var(--primary);
   font-weight: 700;
-  border: 1px solid rgba(82, 183, 136, 0.15);
+  border: 1px solid rgba(16,185,129,.2);
+  box-shadow: 0 0 12px rgba(16,185,129,.1) inset;
 }
 
 .nav-item.active svg {
   color: var(--primary);
+  filter: drop-shadow(0 0 4px rgba(16,185,129,.5));
 }
 
 .nav-label {
@@ -477,16 +481,17 @@
 /* ── NAVBAR ── */
 .navbar {
   height: var(--navbar-h);
-  background: rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid var(--border);
+  background: rgba(5,12,30,.75);
+  border-bottom: 1px solid rgba(16,185,129,.1);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
   flex-shrink: 0;
   gap: 16px;
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  box-shadow: 0 1px 16px rgba(0,0,0,.3);
 }
 
 .navbar-left {
@@ -922,17 +927,18 @@
 
 .student-row.current-row {
   border-color: var(--primary);
-  background: rgba(82, 183, 136, 0.08);
+  background: rgba(16,185,129,.1);
+  box-shadow: 0 0 0 1px rgba(16,185,129,.2) inset;
 }
 
 .student-row.status-present {
-  background: rgba(74, 222, 128, 0.08);
-  border-color: rgba(74, 222, 128, 0.15);
+  background: rgba(16,185,129,.08);
+  border-color: rgba(16,185,129,.2);
 }
 
 .student-row.status-absent {
-  background: rgba(248, 113, 113, 0.08);
-  border-color: rgba(248, 113, 113, 0.15);
+  background: rgba(244,63,94,.08);
+  border-color: rgba(244,63,94,.2);
 }
 
 .student-roll {
@@ -999,10 +1005,17 @@
 }
 
 .summary-header {
-  background: linear-gradient(135deg, #1b4332, #2d6a4f);
+  background: linear-gradient(135deg, #022c22, #065f46, #059669);
   padding: 24px;
   color: #fff;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  position: relative;
+  overflow: hidden;
+}
+.summary-header::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 80% 50%, rgba(16,185,129,.2), transparent);
 }
 
 .summary-header h3 {
@@ -1072,14 +1085,15 @@
 }
 
 .tt-header {
-  background: rgba(82, 183, 136, 0.12);
+  background: linear-gradient(135deg, rgba(16,185,129,.15), rgba(16,185,129,.08));
   color: var(--primary);
   padding: 12px 8px;
-  border-radius: 8px;
+  border-radius: 10px;
   text-align: center;
   font-size: 12px;
   font-weight: 800;
-  border: 1px solid rgba(82, 183, 136, 0.2);
+  border: 1px solid rgba(16,185,129,.25);
+  text-shadow: 0 0 8px rgba(16,185,129,.4);
 }
 
 .tt-time {
@@ -1312,9 +1326,9 @@
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: rgba(0, 0, 0, .75);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,.8);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   display: none;
 }
 
@@ -1323,15 +1337,16 @@
   align-items: flex-start;
   justify-content: center;
   padding-top: 80px;
+  animation: fadeIn .15s ease;
 }
 
 .search-box {
   width: 100%;
-  max-width: 640px;
-  background: rgba(20, 35, 25, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  max-width: 660px;
+  background: rgba(5,15,40,.97);
+  border: 1px solid rgba(16,185,129,.25);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-lg), 0 0 40px rgba(16,185,129,.1);
   overflow: hidden;
 }
 
@@ -1389,18 +1404,18 @@
   position: fixed;
   bottom: 24px;
   right: 24px;
-  width: 56px;
-  height: 56px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: var(--text-inverse);
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: #022c22;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(82, 183, 136, 0.3);
+  box-shadow: 0 8px 28px rgba(16,185,129,.45), 0 0 0 4px rgba(16,185,129,.12);
   z-index: 900;
-  transition: all .2s;
+  transition: all .25s;
   border: none;
 }
 
@@ -1411,21 +1426,21 @@
 
 .chatbot-window {
   position: fixed;
-  bottom: 90px;
+  bottom: 92px;
   right: 24px;
-  width: 380px;
-  height: 520px;
-  background: rgba(18, 30, 20, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
-  box-shadow: var(--shadow-lg);
+  width: 385px;
+  height: 525px;
+  background: rgba(5,15,35,.97);
+  border: 1px solid rgba(16,185,129,.2);
+  border-radius: 22px;
+  box-shadow: var(--shadow-lg), 0 0 40px rgba(16,185,129,.08);
   z-index: 900;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   animation: slideUp .2s ease;
-  -webkit-backdrop-filter: blur(25px);
-  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(30px);
+  backdrop-filter: blur(30px);
 }
 
 .chatbot-window.hidden {
@@ -1433,14 +1448,14 @@
 }
 
 .chatbot-header {
-  background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+  background: linear-gradient(135deg, #022c22, #065f46);
   color: var(--text-primary);
   padding: 16px 20px;
   display: flex;
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(16,185,129,.15);
 }
 
 .chatbot-avatar {
@@ -1581,15 +1596,15 @@
   left: 0;
   right: 0;
   height: var(--bottom-nav-h);
-  background: rgba(10, 24, 13, 0.94);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(5,12,30,.96);
+  border-top: 1px solid rgba(16,185,129,.12);
   z-index: 1000;
   justify-content: space-around;
   align-items: center;
   padding: 0 12px;
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 -4px 24px rgba(0,0,0,0.4);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  box-shadow: 0 -4px 32px rgba(0,0,0,.5);
 }
 
 .bottom-nav-item {

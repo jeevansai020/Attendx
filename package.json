@@ -4,7 +4,7 @@
   "description": "Faculty Attendance Management System",
   "scripts": {
     "start": "python3 server.py",
-    "dev": "python3 server.py",
+    "dev": "fuser -k 5500/tcp 2>/dev/null; sleep 1; python3 server.py",
     "serve-node": "npx serve . -l 5500"
   },
   "devDependencies": {
