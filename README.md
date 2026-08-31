@@ -43,7 +43,8 @@ All data is stored locally in the browser using `localStorage`, making it comple
 - 📈 **Reports & Analytics** — Class-wise and student-wise report generation with date range and subject filters
 - 📤 **CSV Export** — One-click export of attendance reports to downloadable `.csv` files
 - 🖨️ **PDF Export** — Use browser print dialog to save any report as a PDF
-- 🌗 **Dark/Light Theme** — Toggle between dark and light modes; preference persisted across sessions
+- 🌗 **Dark/Light Theme** — Elegant "Sage Linen" light theme (default) and "Deep Moss" dark theme; toggle in the navbar and on the home page, preference persisted across sessions
+- 🏛️ **Home Page** — `home.html`: a themed public overview page (live module vignettes, workflow, modules) with its own theme toggle; the login page links to it
 - 🔔 **Toast Notifications** — Non-intrusive toast alerts for all user actions (success, error, warning, info)
 - 📱 **Responsive Sidebar** — Collapsible navigation sidebar with department info and logout
 
@@ -56,7 +57,7 @@ All data is stored locally in the browser using `localStorage`, making it comple
 | Markup       | HTML5               |
 | Styling      | Vanilla CSS (custom design system) |
 | Logic        | Vanilla JavaScript (ES6+, IIFE module pattern) |
-| Typography   | Inter (Google Fonts) |
+| Typography   | Outfit (display) + Inter (body), Google Fonts |
 | Data Storage | Browser `localStorage` |
 | Dev Server   | `serve` (Node.js package) |
 
@@ -68,7 +69,8 @@ All data is stored locally in the browser using `localStorage`, making it comple
 
 ```
 Attendancesystem/
-├── index.html          # Login page (entry point)
+├── home.html           # Public home page (marketing/overview, themed)
+├── index.html          # Login page (app entry point)
 ├── dashboard.html      # Main application shell (all modules rendered here)
 ├── js/
 │   ├── data.js         # Data layer: auth, students, attendance, timetable, reports, theme, toast
@@ -234,10 +236,11 @@ These shortcuts work when the **Take Attendance** module is active and no input 
 
 ## Theming
 
-AttendX supports **Light** and **Dark** themes via CSS custom properties (`--var` tokens) applied to the `:root` and `[data-theme="dark"]` selectors in `main.css`.
+AttendX is built on a **token-based design system** ("Sage Linen" — see `DESIGN.md`). All color, elevation, and surface values live as CSS custom properties defined twice in `main.css`: `:root` (the light theme, the default) and `html[data-theme="dark"]` ("Deep Moss").
 
-- Toggle using the **moon/sun icon** in the top navbar
-- Preference is saved to `localStorage` and applied on every page load automatically
+- **Light is the default** theme; toggle to dark with the **moon/sun icon** in the top navbar (also in Settings)
+- Preference is saved to `localStorage` (`ax_theme`) and applied before first paint on every page load — no flash of the wrong theme
+- `color-scheme` follows the theme, so native inputs and scrollbars adapt automatically
 
 ---
 
