@@ -4,26 +4,78 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>AttendX – You're Offline</title>
-  <meta name="theme-color" content="#6366f1"/>
+  <meta name="theme-color" content="#3d6353"/>
   <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <script>
+    // Match the app: apply saved theme before first paint (html[data-theme])
+    (function () {
+      var t = 'light';
+      try { t = localStorage.getItem('ax_theme') || 'light'; } catch (e) {}
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0f172a;
-      --surface: #1e293b;
-      --border: rgba(148,163,184,.12);
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-      --accent: #6366f1;
-      --accent-glow: rgba(99,102,241,.35);
+      color-scheme: light;
+      --bg: #f3f1e9;
+      --surface: #fdfcf9;
+      --border: rgba(42,48,42,.13);
+      --card-border: rgba(42,48,42,.10);
+      --text: #262b26;
+      --muted: #666d62;
+      --secondary: #565d55;
+      --accent: #3d6353;
+      --accent-dark: #315143;
+      --accent-soft: #33513f;
+      --accent-light: rgba(61,99,83,.10);
+      --accent-glow: rgba(61,99,83,.28);
+      --terracotta: #b3542e;
+      --danger: #b0452f;
+      --danger-text: #b0452f;
+      --danger-light: rgba(176,69,47,.10);
+      --success: #44754f;
+      --success-light: rgba(68,117,79,.12);
+      --wash-a: rgba(61,99,83,.08);
+      --wash-b: rgba(179,84,46,.06);
+      --shadow-lg: 0 8px 24px rgba(38,43,38,.10), 0 32px 80px rgba(38,43,38,.14);
+      --shadow-sm: 0 1px 2px rgba(38,43,38,.05), 0 2px 10px rgba(38,43,38,.06);
+      --font: 'Inter', system-ui, sans-serif;
+      --font-display: 'Outfit', 'Inter', system-ui, sans-serif;
+    }
+
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #141814;
+      --surface: #1c211c;
+      --border: rgba(250,249,244,.13);
+      --card-border: rgba(250,249,244,.10);
+      --text: #edf0e9;
+      --muted: #9aa294;
+      --secondary: #b9c0b4;
+      --accent: #79a68c;
+      --accent-dark: #6a957c;
+      --accent-soft: #8fc3a1;
+      --accent-light: rgba(121,166,140,.16);
+      --accent-glow: rgba(121,166,140,.30);
+      --terracotta: #d98a64;
+      --danger: #b95038;
+      --danger-text: #e2836a;
+      --danger-light: rgba(217,123,98,.14);
+      --success: #71a884;
+      --success-light: rgba(113,168,132,.16);
+      --wash-a: rgba(121,166,140,.09);
+      --wash-b: rgba(217,138,100,.05);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,.55), 0 32px 80px rgba(0,0,0,.6);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.4), 0 2px 10px rgba(0,0,0,.35);
     }
 
     body {
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: var(--font);
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
@@ -32,24 +84,19 @@
       justify-content: center;
       padding: 24px;
       overflow: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Animated gradient background */
+    /* Ambient wash */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
       background:
-        radial-gradient(ellipse 80% 80% at 20% 20%, rgba(99,102,241,.18) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 60% at 80% 80%, rgba(139,92,246,.12) 0%, transparent 60%);
-      animation: bgPulse 6s ease-in-out infinite alternate;
+        radial-gradient(ellipse 70% 60% at 18% 18%, var(--wash-a) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 55% at 84% 84%, var(--wash-b) 0%, transparent 60%);
       pointer-events: none;
       z-index: 0;
-    }
-
-    @keyframes bgPulse {
-      from { opacity: .6; }
-      to   { opacity: 1;  }
     }
 
     .container {
@@ -70,12 +117,12 @@
       width: 100px;
       height: 100px;
       border-radius: 28px;
-      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
       display: inline-flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 28px;
-      box-shadow: 0 0 48px var(--accent-glow), 0 8px 32px rgba(0,0,0,.4);
+      box-shadow: var(--shadow-lg);
       animation: iconFloat 3s ease-in-out infinite;
     }
 
@@ -87,35 +134,35 @@
     .icon-wrap svg {
       width: 48px;
       height: 48px;
-      stroke: white;
+      stroke: #fff;
       stroke-width: 1.5;
     }
+    html[data-theme="dark"] .icon-wrap svg { stroke: #10150f; }
 
     h1 {
+      font-family: var(--font-display);
       font-size: 2rem;
       font-weight: 800;
       letter-spacing: -.03em;
       margin-bottom: 12px;
-      background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--text);
     }
 
     .subtitle {
       font-size: 1rem;
-      color: var(--muted);
+      color: var(--secondary);
       line-height: 1.6;
       margin-bottom: 36px;
     }
 
     .card {
-      background: rgba(30,41,59,.7);
-      border: 1px solid var(--border);
+      background: var(--surface);
+      border: 1px solid var(--card-border);
       border-radius: 20px;
       padding: 24px;
       margin-bottom: 24px;
-      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-sm);
+      text-align: left;
     }
 
     .tip-title {
@@ -123,9 +170,10 @@
       font-weight: 700;
       letter-spacing: .08em;
       text-transform: uppercase;
-      color: var(--accent);
+      color: var(--accent-soft);
       margin-bottom: 14px;
     }
+    html[data-theme="dark"] .tip-title { color: var(--accent-soft); }
 
     .tip-list {
       list-style: none;
@@ -137,7 +185,7 @@
       align-items: flex-start;
       gap: 10px;
       font-size: 13px;
-      color: var(--muted);
+      color: var(--secondary);
       padding: 6px 0;
       border-bottom: 1px solid var(--border);
     }
@@ -167,30 +215,35 @@
       font-weight: 600;
       font-family: inherit;
       cursor: pointer;
-      border: none;
+      border: 1px solid transparent;
       transition: all .2s ease;
       text-decoration: none;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--accent), #8b5cf6);
-      color: white;
+      background: var(--accent);
+      color: #fff;
       box-shadow: 0 4px 16px var(--accent-glow);
     }
+    html[data-theme="dark"] .btn-primary { color: #10150f; }
 
     .btn-primary:hover {
       transform: translateY(-2px);
+      background: var(--accent-dark);
       box-shadow: 0 8px 24px var(--accent-glow);
     }
+    html[data-theme="dark"] .btn-primary:hover { background: var(--accent-dark); color: #10150f; }
 
     .btn-secondary {
-      background: rgba(148,163,184,.1);
+      background: var(--surface);
       color: var(--text);
       border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
     }
 
     .btn-secondary:hover {
-      background: rgba(148,163,184,.18);
+      background: var(--accent-light);
+      border-color: var(--accent-glow);
       transform: translateY(-2px);
     }
 
@@ -198,21 +251,22 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(239,68,68,.12);
-      border: 1px solid rgba(239,68,68,.25);
-      color: #fca5a5;
+      background: var(--danger-light);
+      border: 1px solid var(--danger-light);
+      color: var(--danger-text);
       padding: 6px 14px;
       border-radius: 100px;
       font-size: 12px;
       font-weight: 600;
       margin-bottom: 20px;
+      transition: all .3s;
     }
 
     .status-dot {
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: #ef4444;
+      background: var(--danger);
       animation: blink 1.5s ease-in-out infinite;
     }
 
@@ -233,9 +287,8 @@
   </div>
 
   <!-- Offline badge -->
-  <div class="status-badge">
-    <span class="status-dot"></span>
-    No Internet Connection
+  <div class="status-badge" id="statusBadge">
+    <span class="status-dot"></span> No Internet Connection
   </div>
 
   <h1>You're Offline</h1>
@@ -245,7 +298,7 @@
 
   <!-- What's available offline -->
   <div class="card">
-    <div class="tip-title">📦 Available Offline</div>
+    <div class="tip-title">Available Offline</div>
     <ul class="tip-list">
       <li>
         <span class="tip-icon">✅</span>
@@ -282,10 +335,13 @@
 <script>
   // Auto-reload when connection is restored
   window.addEventListener('online', () => {
-    document.querySelector('.status-badge').innerHTML = '<span style="width:7px;height:7px;border-radius:50%;background:#10b981;display:inline-block"></span> Back Online! Reloading…';
-    document.querySelector('.status-badge').style.background = 'rgba(16,185,129,.12)';
-    document.querySelector('.status-badge').style.borderColor = 'rgba(16,185,129,.25)';
-    document.querySelector('.status-badge').style.color = '#6ee7b7';
+    const badge = document.getElementById('statusBadge');
+    if (badge) {
+      badge.innerHTML = '<span style="width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block"></span> Back Online! Reloading…';
+      badge.style.background = 'var(--success-light)';
+      badge.style.borderColor = 'var(--success-light)';
+      badge.style.color = 'var(--success)';
+    }
     setTimeout(() => history.back(), 1500);
   });
 </script>

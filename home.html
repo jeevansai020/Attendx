@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>AttendX – Keyboard-first faculty attendance, offline or not</title>
+  <meta name="description" content="AttendX is the keyboard-first attendance system for college faculty. Load a roster, mark present/absent with two keys, save and export, fully offline-capable."/>
+  <meta name="theme-color" content="#3d6353"/>
+  <!-- Open Graph -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="AttendX – Keyboard-first faculty attendance"/>
+  <meta property="og:description" content="Load a roster, mark with two keys, save and export, offline or not. Built for college faculty."/>
+  <meta property="og:image" content="assets/og-image.png"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="manifest" href="manifest.json"/>
+  <script>
+    // Apply saved theme before first paint — the design system keys off html[data-theme]
+    (function () {
+      var t = 'light';
+      try { t = localStorage.getItem('ax_theme') || 'light'; } catch (e) {}
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles/main.css"/>
+  <link rel="stylesheet" href="styles/home.css"/>
+</head>
+<body class="home-body">
+
+<!-- ══════════════ HEADER ══════════════ -->
+<header class="home-header">
+  <a class="home-brand" href="home.html" aria-label="AttendX home">
+    <span class="home-brand-mark" aria-hidden="true">
+      <svg width="18" height="18" viewBox="0 0 40 40" fill="none">
+        <path d="M8 28V16l12-8 12 8v12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="15" y="20" width="10" height="8" rx="2" stroke="currentColor" stroke-width="3"/>
+        <circle cx="20" cy="14" r="2.4" fill="currentColor"/>
+      </svg>
+    </span>
+    <span class="home-brand-name">AttendX</span>
+  </a>
+  <nav class="home-nav" aria-label="Page">
+    <a href="#modules">Modules</a>
+    <a href="#workflow">Workflow</a>
+    <a href="#why">Why AttendX</a>
+  </nav>
+  <div class="home-header-actions">
+    <button class="home-theme-toggle" id="homeThemeToggle" type="button" title="Toggle theme" aria-label="Toggle dark or light theme">
+      <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <a class="btn btn-primary btn-sm home-cta-header" href="index.html">Open the app</a>
+  </div>
+</header>
+
+<main>
+<!-- ══════════════ HERO ══════════════ -->
+<section class="home-hero">
+  <img class="home-hero-figure" src="assets/rgukt-figure.svg" alt="" aria-hidden="true"/>
+  <div class="home-hero-inner">
+    <h1 class="home-h1">Mark a full class in <em>under a minute.</em></h1>
+    <p class="home-lede">
+      AttendX is the keyboard-first attendance system for college faculty.
+      Load a roster, mark present or absent with two keys, save and export,
+      whether the network is alive or not.
+    </p>
+    <div class="home-hero-actions">
+      <a class="btn btn-primary btn-lg" href="index.html">Open the app</a>
+      <a class="btn btn-secondary btn-lg" href="#workflow">See the workflow</a>
+    </div>
+    <p class="home-hero-note">No setup needed; demo accounts wait on the login page.</p>
+  </div>
+</section>
+
+<!-- ══════════════ BENTO LEDGER ══════════════ -->
+<section class="home-bento" aria-label="What AttendX looks like">
+
+  <!-- Roster (signature tile) -->
+  <div class="tile tile-roster reveal">
+    <div class="tile-head">
+      <span class="tile-title">Data Structures <span class="tile-meta">CSE · Sec B</span></span>
+      <span class="badge badge-primary">Aug 26</span>
+    </div>
+    <div class="mini-roster">
+      <div class="mini-row">
+        <span class="mini-roll">CS22-014</span>
+        <span class="mini-name">Ananya Iyer</span>
+        <span class="mini-status is-p">P</span>
+      </div>
+      <div class="mini-row is-current">
+        <span class="mini-roll">CS22-015</span>
+        <span class="mini-name">Rohan Verma</span>
+        <span class="mini-status is-pending">—</span>
+        <span class="mini-keyhint"><span class="kbd">P</span> present</span>
+      </div>
+      <div class="mini-row">
+        <span class="mini-roll">CS22-016</span>
+        <span class="mini-name">Sara Khan</span>
+        <span class="mini-status is-a">A</span>
+      </div>
+      <div class="mini-row">
+        <span class="mini-roll">CS22-017</span>
+        <span class="mini-name">Vikram Nair</span>
+        <span class="mini-status is-p">P</span>
+      </div>
+    </div>
+    <div class="tile-foot">
+      <span class="foot-count"><i class="dot dot-p"></i>42 present</span>
+      <span class="foot-count"><i class="dot dot-a"></i>3 absent</span>
+      <span class="foot-count"><i class="dot dot-w"></i>2 pending</span>
+    </div>
+  </div>
+
+  <!-- Ring -->
+  <div class="tile tile-ring reveal">
+    <div class="ring-wrap">
+      <svg class="ring-svg" viewBox="0 0 120 120" aria-hidden="true">
+        <circle class="ring-bg" cx="60" cy="60" r="52"/>
+        <circle class="ring-fg" cx="60" cy="60" r="52" data-pct="78"/>
+      </svg>
+      <div class="ring-center">
+        <span class="ring-pct">78%</span>
+        <span class="ring-sub">class attendance</span>
+      </div>
+    </div>
+    <div class="tile-title ring-title">Syllabus coverage · Unit 3</div>
+    <span class="badge badge-success">Above the 75% line</span>
+  </div>
+
+  <!-- Calendar -->
+  <div class="tile tile-cal reveal">
+    <div class="tile-head">
+      <span class="tile-title">August 2026</span>
+      <span class="tile-meta">44 sessions</span>
+    </div>
+    <div class="mini-cal" aria-hidden="true">
+      <div class="cal-dow">M</div><div class="cal-dow">T</div><div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div><div class="cal-dow">S</div><div class="cal-dow">S</div>
+      <div class="cal-d cal-off"></div><div class="cal-d cal-off"></div>
+      <div class="cal-d">1</div><div class="cal-d">2</div><div class="cal-d">3</div><div class="cal-d has-dot">4</div><div class="cal-d">5</div>
+      <div class="cal-d">6</div><div class="cal-d">7</div><div class="cal-d">8</div><div class="cal-d">9</div><div class="cal-d">10</div><div class="cal-d has-dot">11</div><div class="cal-d">12</div>
+      <div class="cal-d">13</div><div class="cal-d">14</div><div class="cal-d">15</div><div class="cal-d">16</div><div class="cal-d">17</div><div class="cal-d has-dot">18</div><div class="cal-d">19</div>
+      <div class="cal-d">20</div><div class="cal-d">21</div><div class="cal-d has-dot">22</div><div class="cal-d">23</div><div class="cal-d">24</div><div class="cal-d">25</div><div class="cal-d is-today">26</div>
+    </div>
+    <div class="tile-foot"><span class="tile-meta">Every dot is a recorded class. Tap any day for its sessions.</span></div>
+  </div>
+
+  <!-- Timetable -->
+  <div class="tile tile-tt reveal">
+    <div class="tile-head">
+      <span class="tile-title">This week</span>
+      <span class="tile-meta">Mon – Wed</span>
+    </div>
+    <div class="mini-tt" aria-hidden="true">
+      <div class="tt-l">9:00</div>
+      <div class="tt-c tt-filled"><b>Data Structures</b><small>CSE · B</small></div>
+      <div class="tt-c tt-empty"></div>
+      <div class="tt-c tt-empty"></div>
+      <div class="tt-l">10:00</div>
+      <div class="tt-c tt-empty"></div>
+      <div class="tt-c tt-filled"><b>DBMS</b><small>CSE · A</small></div>
+      <div class="tt-c tt-empty"></div>
+      <div class="tt-l">12:00</div>
+      <div class="tt-c tt-lunch" colspan="3"><span>🍱 Lunch</span></div>
+    </div>
+    <div class="tile-foot"><span class="tile-meta">Click a cell to schedule a class. Lunch stays protected.</span></div>
+  </div>
+
+  <!-- Report -->
+  <div class="tile tile-rep reveal">
+    <div class="tile-head">
+      <span class="tile-title">Student-wise report</span>
+      <span class="tile-meta">Sem II</span>
+    </div>
+    <div class="mini-rep" aria-hidden="true">
+      <div class="rep-row"><span class="rep-name">Ananya Iyer</span><span class="rep-sub">DBMS</span><span class="pct-ring pct-high">91%</span></div>
+      <div class="rep-row"><span class="rep-name">Rohan Verma</span><span class="rep-sub">DBMS</span><span class="pct-ring pct-medium">71%</span></div>
+      <div class="rep-row"><span class="rep-name">Sara Khan</span><span class="rep-sub">DBMS</span><span class="pct-ring pct-low">48%</span></div>
+    </div>
+    <div class="tile-foot tile-foot-btns">
+      <span class="btn btn-secondary btn-sm">Export CSV</span>
+      <span class="btn btn-ghost btn-sm">Print PDF</span>
+    </div>
+  </div>
+
+  <!-- Offline strip -->
+  <div class="tile tile-offline reveal">
+    <span class="offline-dot" aria-hidden="true"></span>
+    <div class="offline-copy">
+      <strong>Works offline, by design.</strong>
+      <span>No signal in the corridor? Roster, calendar and reports still load, and your saved sessions wait safely until you're back.</span>
+    </div>
+    <span class="offline-badge">Offline-first PWA</span>
+  </div>
+</section>
+
+<!-- ══════════════ WORKFLOW ══════════════ -->
+<section class="home-section home-workflow" id="workflow">
+  <h2 class="home-h2">From the classroom door to a saved class in four moves.</h2>
+  <p class="home-h2-sub">Every step is built for the moment you have 40 students looking at you.</p>
+  <ol class="wf-grid">
+    <li class="wf-step reveal">
+      <span class="wf-num">1</span>
+      <h3>Pick the class</h3>
+      <p>Year, section, subject: three selects, remembered from last time.</p>
+      <div class="wf-chips" aria-hidden="true"><span class="wf-chip">3rd Year</span><span class="wf-chip">A</span><span class="wf-chip is-active">DBMS</span></div>
+    </li>
+    <li class="wf-step reveal">
+      <span class="wf-num">2</span>
+      <h3>Load the roster</h3>
+      <p>Every roll number, in order, on screen before the bell rings.</p>
+      <div class="wf-chips" aria-hidden="true"><span class="wf-chip is-muted">CS22-001 · … · CS22-047</span></div>
+    </li>
+    <li class="wf-step reveal">
+      <span class="wf-num">3</span>
+      <h3>Mark as you go</h3>
+      <p>Two keys do the work. The roster keeps pace with your roll call.</p>
+      <div class="wf-keys" aria-hidden="true"><span class="kbd kbd-lg">P</span><span class="kbd kbd-lg">A</span><span class="kbd kbd-lg">↑</span><span class="kbd kbd-lg">↓</span></div>
+    </li>
+    <li class="wf-step reveal">
+      <span class="wf-num">4</span>
+      <h3>Save &amp; share</h3>
+      <p>One tap: session saved, summary ready as CSV, PDF, or the absentee list on WhatsApp.</p>
+      <div class="wf-chips" aria-hidden="true"><span class="wf-chip is-active">Save Attendance</span></div>
+    </li>
+  </ol>
+</section>
+
+<!-- ══════════════ MODULES LEDGER ══════════════ -->
+<section class="home-section home-modules" id="modules">
+  <h2 class="home-h2">Everything a faculty member touches.</h2>
+  <div class="module-ledger">
+    <a class="module-row reveal" href="index.html">
+      <svg class="module-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      <span class="module-name">Dashboard</span>
+      <span class="module-desc">Today's classes, live stats, and a straight shot into your next session.</span>
+    </a>
+    <a class="module-row reveal" href="index.html">
+      <svg class="module-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span class="module-name">Take Attendance</span>
+      <span class="module-desc">The keyboard-first marking workflow. The heart of the system.</span>
+    </a>
+    <a class="module-row reveal" href="index.html">
+      <svg class="module-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+      <span class="module-name">Calendar</span>
+      <span class="module-desc">A month at a glance: every recorded class marked, every day tappable.</span>
+    </a>
+    <a class="module-row reveal" href="index.html">
+      <svg class="module-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="20" x2="4" y2="10"/><line x1="10" y1="20" x2="10" y2="4"/><line x1="16" y1="20" x2="16" y2="14"/><line x1="21" y1="20" x2="3" y2="20"/></svg>
+      <span class="module-name">Reports &amp; Analytics</span>
+      <span class="module-desc">Class-wise, student-wise and low-attendance reports. Export or print.</span>
+    </a>
+    <a class="module-row reveal" href="index.html">
+      <svg class="module-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="module-name">Students</span>
+      <span class="module-desc">Rosters per class, with each student's own attendance history.</span>
+    </a>
+    <a class="module-row reveal" href="index.html">
+      <svg class="module-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
+      <span class="module-name">Timetable</span>
+      <span class="module-desc">A Mon–Fri weekly grid with protected lunch. Click a cell, assign a class.</span>
+    </a>
+  </div>
+  <p class="modules-more">…plus Extra Classes, Notifications, Corrections, Analytics, Syllabus Coverage and Settings inside the app.</p>
+</section>
+
+<!-- ══════════════ WHY ══════════════ -->
+<section class="home-section home-why" id="why">
+  <div class="why-grid">
+    <div class="why-copy">
+      <h2 class="home-h2">Built for the way a class actually happens.</h2>
+      <div class="why-point reveal">
+        <h3>Keyboard-first.</h3>
+        <p><span class="kbd">P</span> marks present, <span class="kbd">A</span> marks absent, the arrows move you down the roster. Your hands never leave the home row.</p>
+      </div>
+      <div class="why-point reveal">
+        <h3>Offline-first.</h3>
+        <p>Every record lives on your machine, or in your own Supabase project when you want sync. A dead network never costs you a class.</p>
+      </div>
+      <div class="why-point reveal">
+        <h3>Yours to keep.</h3>
+        <p>One-click CSV export and print-to-PDF on every report. What you recorded is yours, in formats that outlive any app.</p>
+      </div>
+    </div>
+    <aside class="why-panel reveal">
+      <svg class="why-figure" viewBox="0 0 200 250" aria-hidden="true">
+        <circle cx="100" cy="30" r="21" fill="currentColor"/>
+        <path fill="currentColor" d="M 96.4 86.3 Q 48.1 49.8 12.3 20.5 L 15.7 15.5 Q 55.9 38.2 107.6 69.7 Z"/>
+        <path fill="currentColor" d="M 103.9 86.1 Q 154.1 45.7 187.8 16.4 L 184.2 11.6 Q 145.9 34.3 92.1 69.9 Z"/>
+        <line x1="100" y1="76" x2="100" y2="130" stroke="currentColor" stroke-width="24" stroke-linecap="round"/>
+        <path fill="currentColor" d="M 91.9 120.6 Q 49.7 171.1 20.6 223.8 L 27.4 228.2 Q 62.3 180.9 108.1 135.4 Z"/>
+        <path fill="currentColor" d="M 92.9 138.9 Q 145.4 167.6 177.4 232 L 186.6 228 Q 158.6 156.4 107.1 117.1 Z"/>
+      </svg>
+      <h3 class="why-panel-title">The 75% line</h3>
+      <p class="why-panel-text">
+        Every student is tracked against your college's minimum attendance.
+        AttendX flags the ones slipping before the semester does,
+        and prints the proof when the office asks.
+      </p>
+      <div class="why-bars" aria-hidden="true">
+        <div class="why-bar"><span class="why-bar-label">Ananya</span><div class="pct-bar"><div class="pct-bar-fill" style="width:91%;background:var(--success)"></div></div><span class="why-bar-val">91%</span></div>
+        <div class="why-bar"><span class="why-bar-label">Rohan</span><div class="pct-bar"><div class="pct-bar-fill" style="width:71%;background:var(--warning)"></div></div><span class="why-bar-val">71%</span></div>
+        <div class="why-bar"><span class="why-bar-label">Sara</span><div class="pct-bar"><div class="pct-bar-fill" style="width:48%;background:var(--danger)"></div></div><span class="why-bar-val">48%</span></div>
+        <div class="why-line"><span>75% minimum</span></div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ══════════════ CTA BAND ══════════════ -->
+<section class="home-section">
+  <div class="cta-band reveal">
+    <div class="cta-copy">
+      <h2>Ready for your first class?</h2>
+      <p>Open the app, pick a demo account, and mark your first roster.</p>
+    </div>
+    <a class="btn btn-cta" href="index.html">Open the app
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+  </div>
+</section>
+</main>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer class="home-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="home-brand-mark" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 40 40" fill="none">
+          <path d="M8 28V16l12-8 12 8v12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="15" y="20" width="10" height="8" rx="2" stroke="currentColor" stroke-width="3"/>
+          <circle cx="20" cy="14" r="2.4" fill="currentColor"/>
+        </svg>
+      </span>
+      <span class="home-brand-name">AttendX</span>
+      <p>The keyboard-first attendance system for college faculty. Offline-capable, exportable, yours.</p>
+    </div>
+    <nav class="footer-links" aria-label="Footer">
+      <a href="index.html">Open the app</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="offline.html">Offline page</a>
+      <a href="https://github.com/rizardo-maker/Attendx" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+    <div class="footer-figure" aria-hidden="true">
+      <img src="assets/rgukt-figure.svg" alt="" aria-hidden="true"/>
+    </div>
+  </div>
+  <div class="footer-base">
+    <span>Built for college faculty · <span id="homeYear">2026</span></span>
+    <a href="index.html">About this page &amp; the app → sign in to continue</a>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── Theme toggle (same mechanism as the app: data-theme + ax_theme) ──
+  var root = document.documentElement;
+  var btn = document.getElementById('homeThemeToggle');
+  var metaTheme = document.querySelector('meta[name="theme-color"]');
+  function iconFor(t) {
+    // Same convention as the app: in dark show the sun (click → light), in light show the moon
+    var moon = btn.querySelector('.icon-moon'), sun = btn.querySelector('.icon-sun');
+    moon.style.display = t === 'dark' ? 'none' : '';
+    sun.style.display = t === 'dark' ? '' : 'none';
+  }
+  function applyMeta() {
+    if (metaTheme) metaTheme.setAttribute('content', root.getAttribute('data-theme') === 'dark' ? '#141814' : '#3d6353');
+  }
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var next = (root.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('ax_theme', next); } catch (e) {}
+      iconFor(next);
+      applyMeta();
+    });
+  }
+  iconFor(root.getAttribute('data-theme') || 'light');
+  applyMeta();
+
+  // ── Reveal on scroll (transform + opacity only) ──
+  var revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    revealEls.forEach(function (el, i) {
+      el.style.transitionDelay = (Math.min(i % 6, 4) * 60) + 'ms';
+      io.observe(el);
+    });
+  } else {
+    revealEls.forEach(function (el) { el.classList.add('is-in'); });
+  }
+
+  // ── Ring draw on first view ──
+  var ring = document.querySelector('.ring-fg');
+  if (ring) {
+    var pct = (parseFloat(ring.getAttribute('data-pct')) || 0) / 100;
+    var C = 2 * Math.PI * 52;
+    ring.style.strokeDasharray = C;
+    ring.style.strokeDashoffset = C;
+    function draw() {
+      ring.style.transition = 'stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1)';
+      requestAnimationFrame(function () { ring.style.strokeDashoffset = C * (1 - pct); });
+    }
+    if ('IntersectionObserver' in window) {
+      var rio = new IntersectionObserver(function (es) {
+        es.forEach(function (en) { if (en.isIntersecting) { draw(); rio.disconnect(); } });
+      }, { threshold: 0.4 });
+      rio.observe(ring);
+    } else { draw(); }
+  }
+
+  // ── Year ──
+  var y = document.getElementById('homeYear');
+  if (y) y.textContent = String(new Date().getFullYear());
+})();
+</script>
+</body>
+</html>
