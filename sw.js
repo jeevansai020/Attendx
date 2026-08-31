@@ -3,9 +3,9 @@
  * Strategy: Cache-First for static assets, Network-First for API/dynamic
  */
 
-const CACHE_NAME = 'attendx-v1.1';
-const STATIC_CACHE = 'attendx-static-v1.1';
-const DYNAMIC_CACHE = 'attendx-dynamic-v1.1';
+const CACHE_NAME = 'attendx-v1.3';
+const STATIC_CACHE = 'attendx-static-v1.3';
+const DYNAMIC_CACHE = 'attendx-dynamic-v1.3';
 
 // Core assets to pre-cache on install
 const PRECACHE_ASSETS = [
@@ -13,8 +13,12 @@ const PRECACHE_ASSETS = [
   '/index.html',
   '/dashboard.html',
   '/offline.html',
+  '/home.html',
   '/manifest.json',
   '/favicon.svg',
+  '/assets/rgukt-figure.svg',
+  '/assets/og-image.png',
+  '/assets/linen-texture.jpg',
   '/styles/main.css',
   '/styles/login.css',
   '/styles/dashboard.css',

@@ -1102,7 +1102,7 @@ function _acRenderImportPreview(parsed, errors, year, section) {
   </div>`;
 
   if (errCount) {
-    html += `<div style="margin-top:10px;padding:10px 14px;background:var(--danger-light);border-radius:8px;font-size:12px;color:#991b1b">
+    html += `<div style="margin-top:10px;padding:10px 14px;background:var(--danger-light);border:1px solid var(--danger-light);border-radius:8px;font-size:12px;color:var(--danger)">
       <strong>⚠ Skipped rows:</strong> ${errors.map(e => `Row ${e.line} (${e.reason})`).join(' · ')}
     </div>`;
   }
